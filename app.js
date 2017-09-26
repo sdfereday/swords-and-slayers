@@ -11,43 +11,75 @@ class MixinBuilder {
     }
 }
 
-/// Components (class-likes)
-let UserControlled = (superclass) => class extends superclass {
+class Helpers {
 
-    initCursors() {
+    static Dist(object, target) {
 
-        this.cursors = this.game.input.keyboard.createCursorKeys();
+        let a = object.x - target.x;
+        let b = object.y - target.y;
 
-    }
+        return Math.sqrt(a * a + b * b);
 
-    initInteractionKeys(cb) {
-
-        this.interactionKey = this.game.input.keyboard.addKey(Phaser.Keyboard.E);
-
-        if (cb)
-            this.interactionKey.onDown.add(cb, this);
-
-    }
-
-    inputDirection() {
-
-        return {
-            x: this.cursors.left.isDown || this.cursors.right.isDown ? (this.cursors.left.isDown ? -1 : 1) : 0,
-            y: this.cursors.up.isDown || this.cursors.down.isDown ? (this.cursors.up.isDown ? -1 : 1) : 0
-        }
-
-    }
-
-};
-
-/// Data holders
-class PlayerInventory {
-
-    constructor() {
-        this.inventory = [];
     }
 
 }
+
+
+/// Components (class-likes)
+let UserControlled = (superclass) => class extends superclass {
+
+    //// TODO: Move this lot out of here and in to global. It'll be easier to configure from there.
+    // This function should return true when the player activates the "go left" control
+    // In this case, either holding the right arrow or tapping or clicking on the left
+    // side of the screen.
+    leftInputIsActive() {
+        let isActive = false;
+
+        isActive = this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT);
+        isActive |= (this.game.input.activePointer.isDown &&
+            this.game.input.activePointer.x < this.game.width / 4);
+
+        return isActive;
+    }
+
+    // This function should return true when the player activates the "go right" control
+    // In this case, either holding the right arrow or tapping or clicking on the right
+    // side of the screen.
+    rightInputIsActive() {
+        let isActive = false;
+
+        isActive = this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
+        isActive |= (this.game.input.activePointer.isDown &&
+            this.game.input.activePointer.x > this.game.width / 2 + this.game.width / 4);
+
+        return isActive;
+    }
+
+    // This function should return true when the player activates the "jump" control
+    // In this case, either holding the up arrow or tapping or clicking on the center
+    // part of the screen.
+    upInputIsActive(duration) {
+        let isActive = false;
+
+        isActive = this.game.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
+        isActive |= (this.game.input.activePointer.justPressed(duration + 1000 / 60) &&
+            this.game.input.activePointer.x > this.game.width / 4 &&
+            this.game.input.activePointer.x < this.game.width / 2 + this.game.width / 4);
+
+        return isActive;
+    }
+
+    // This function returns true when the player releases the "jump" control
+    upInputReleased() {
+        let released = false;
+
+        released = this.game.input.keyboard.upDuration(Phaser.Keyboard.UP);
+        released |= this.game.input.activePointer.justReleased();
+
+        return released;
+    }
+
+};
 
 /// Entities
 class Hero extends mix(Phaser.Sprite).with(UserControlled) {
@@ -67,15 +99,11 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         this.stats = {
             hp: 4,
             maxHp: 4
-        }
+        };
 
         this.config = {
             movementSpeed: 200
-        }
-
-        // Component initializers
-        //this.initCursors(game);
-        //this.initInteractionKeys(this.onInteractKey);
+        };
 
         /////
         this.MAX_SPEED = 500; // pixels/second
@@ -102,12 +130,6 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
     }
 
     update() {
-
-        // As pure as I can think of right now.
-        //let dir = this.inputDirection();
-
-        //this.body.velocity.x = dir.x * this.config.movementSpeed;
-        //this.body.velocity.y = dir.y * this.config.movementSpeed;
 
         if (this.leftInputIsActive()) {
             // If the LEFT key is down, set the player velocity to move left
@@ -144,57 +166,6 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
 
     }
 
-    //// TODO: Move this lot out of here and in to global. It'll be easier to configure from there.
-    // This function should return true when the player activates the "go left" control
-    // In this case, either holding the right arrow or tapping or clicking on the left
-    // side of the screen.
-    leftInputIsActive() {
-        var isActive = false;
-
-        isActive = this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT);
-        isActive |= (this.game.input.activePointer.isDown &&
-            this.game.input.activePointer.x < this.game.width / 4);
-
-        return isActive;
-    }
-
-    // This function should return true when the player activates the "go right" control
-    // In this case, either holding the right arrow or tapping or clicking on the right
-    // side of the screen.
-    rightInputIsActive() {
-        var isActive = false;
-
-        isActive = this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
-        isActive |= (this.game.input.activePointer.isDown &&
-            this.game.input.activePointer.x > this.game.width / 2 + this.game.width / 4);
-
-        return isActive;
-    }
-
-    // This function should return true when the player activates the "jump" control
-    // In this case, either holding the up arrow or tapping or clicking on the center
-    // part of the screen.
-    upInputIsActive(duration) {
-        var isActive = false;
-
-        isActive = this.game.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
-        isActive |= (this.game.input.activePointer.justPressed(duration + 1000 / 60) &&
-            this.game.input.activePointer.x > this.game.width / 4 &&
-            this.game.input.activePointer.x < this.game.width / 2 + this.game.width / 4);
-
-        return isActive;
-    };
-
-    // This function returns true when the player releases the "jump" control
-    upInputReleased() {
-        var released = false;
-
-        released = this.game.input.keyboard.upDuration(Phaser.Keyboard.UP);
-        released |= this.game.input.activePointer.justReleased();
-
-        return released;
-    };
-
 }
 
 class Enemy extends Phaser.Sprite {
@@ -214,16 +185,82 @@ class Enemy extends Phaser.Sprite {
         this.stats = {
             hp: 4,
             maxHp: 4
-        }
+        };
 
         this.config = {
-            movementSpeed: 200
+            movementSpeed: 200,
+            alertRange: 200
+        };
+
+        this.currentTarget = null;
+
+        // There should probably be only one tree instance, not one per entity
+        this.blackboard = new b3.Blackboard();
+        this.tree = new b3.BehaviorTree();
+
+        // https://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php
+        // http://behavior3js.guineashots.com/ -> When all children return true, priority will run on that parent
+        // Out of range would be better as a decorator.
+        // You can load all this from JSON ultimately (see docs above)
+        this.tree.root = new b3.Priority({
+            children: [
+                new b3.Sequence({
+                    children: [
+                        new OutOfRange(),
+                        new Idle()
+                    ]
+                }),
+                new b3.Sequence({
+                    children: [
+                        new InRange(),
+                        new Follow()
+                    ]
+                })
+            ]
+        });
+
+    }
+
+    update() {
+
+        this.body.velocity.x = 0;
+
+        this.tree.tick(this, this.blackboard);
+
+        if (this.currentTarget) {
+            let dist = Helpers.Dist(this, this.currentTarget);
+            this.blackboard.set('inRangeOfTarget', dist < this.config.alertRange);
         }
 
     }
 
+    chaseTarget() {
+
+        let dirToTarget = this.blackboard.get('currentTarget').x > this.x ? 1 : -1;
+        this.move(dirToTarget);
+
+    }
+
+    move(dir) {
+
+        if (Helpers.Dist(this, this.currentTarget) < 5)
+            return;
+
+        this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
+
+    }
+
+    setTarget(t) {
+
+        this.currentTarget = t;
+        this.blackboard.set('currentTarget', this.currentTarget);
+
+    }
+
     takeDamage(n) {
+
         console.log(this.name + " is taking damage: " + n);
+
     }
 
 }
@@ -243,9 +280,10 @@ class Weapon extends Phaser.Sprite {
         this.body.enable = false;
         this.alpha = 0;
 
+        // You can override this
         this.stats = {
             damageOutput: 1
-        }
+        };
 
     }
 
@@ -254,16 +292,20 @@ class Weapon extends Phaser.Sprite {
     }
 
     use() {
+        
         // TODO: To clean up properly. :P
         if (this.body.enabled)
             return;
-        this.body.enable = true;
+        
+            this.body.enable = true;
         this.alpha = 1;
+        
         let self = this;
-        setTimeout(function() {
+        setTimeout(function () {
             self.body.enable = false;
             self.alpha = 0;
         }, 100);
+
     }
 
 }
@@ -306,9 +348,9 @@ function create() {
         Phaser.Keyboard.DOWN
     ]);
 
-    this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.E);
+    this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
 
-    this.attackKey.onDown.add(function() {
+    this.attackKey.onDown.add(function () {
         this.activeWeapon.use();
     }, this);
 
@@ -323,7 +365,7 @@ function create() {
         this.ground.add(groundBlock);
     }
 
-    this.hero = new Hero(game, 100, 100, 'player');
+    this.hero = new Hero(game, 120, 100, 'player');
     this.hero.frame = 1;
 
     this.hero.body.setSize(48, 48, 48, 80);
@@ -342,8 +384,10 @@ function create() {
 
     // This risks getting messy, just ensure that stuff is separated out per thing it does.
     this.enemies = game.add.group();
-    let enemy = new Enemy(game, game.width / 2, 10, 'some-npc');
+    let enemy = new Enemy(game, 90, 100, 'player');
     this.enemies.add(enemy);
+
+    enemy.setTarget(this.hero);
 
 }
 
@@ -352,7 +396,7 @@ function update() {
     this.game.physics.arcade.collide(this.hero, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.ground);
 
-    this.game.physics.arcade.overlap(this.activeWeapon, this.enemies, function(weapon, npc) {
+    this.game.physics.arcade.overlap(this.activeWeapon, this.enemies, function (weapon, npc) {
         npc.takeDamage(weapon.damageOutput());
     }, null, this);
 
