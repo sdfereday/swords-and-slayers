@@ -260,7 +260,7 @@ class Enemy extends Phaser.Sprite {
     takeDamage(n, origin) {
 
         console.log(this.name + " is taking damage: " + n);
-        console.log(origin + " was origin of damage.");
+        console.log(origin, "was origin of damage.");
 
     }
 
