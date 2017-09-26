@@ -257,9 +257,10 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    takeDamage(n) {
+    takeDamage(n, origin) {
 
         console.log(this.name + " is taking damage: " + n);
+        console.log(origin + " was origin of damage.");
 
     }
 
@@ -397,7 +398,10 @@ function update() {
     this.game.physics.arcade.collide(this.enemies, this.ground);
 
     this.game.physics.arcade.overlap(this.activeWeapon, this.enemies, function (weapon, npc) {
-        npc.takeDamage(weapon.damageOutput());
+        npc.takeDamage(weapon.damageOutput(), {
+            x: weapon.x,
+            y: weapon.y
+        });
     }, null, this);
 
 }
