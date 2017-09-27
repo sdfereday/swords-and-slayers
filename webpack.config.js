@@ -18,7 +18,7 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.jsx', '.json'],
-        modules: [path.resolve(__dirname, 'libs'), path.resolve(__dirname, 'node_modules/webpack')],
+        modules: [path.resolve(__dirname, 'libs')],
         alias: {
             'phaser': path.join(phaserModule, 'build/custom/phaser-split.js'),
             'pixi': path.join(phaserModule, 'build/custom/pixi.js'),
