@@ -1,5 +1,3 @@
-let mix = (superclass) => new MixinBuilder(superclass);
-
 class MixinBuilder {
     constructor(superclass) {
         this.superclass = superclass;
@@ -9,3 +7,5 @@ class MixinBuilder {
         return mixins.reduce((c, mixin) => mixin(c), this.superclass);
     }
 }
+
+export default (superclass) => new MixinBuilder(superclass);

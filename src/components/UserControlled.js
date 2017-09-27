@@ -52,3 +52,5 @@ let UserControlled = (superclass) => class extends superclass {
     }
 
 };
+
+export default UserControlled;

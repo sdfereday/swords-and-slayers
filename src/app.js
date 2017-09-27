@@ -1,3 +1,12 @@
+import 'pixi';
+import 'p2';
+import Phaser from 'phaser';
+import Hero from '../src/entities/Hero';
+import Enemy from '../src/entities/Enemy';
+import Weapon from '../src/entities/Weapon';
+
+//// TODO: Fix the problem with the relative import urls
+//// TODO: Convert to es6
 /// Game world
 let game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
     preload: preload,

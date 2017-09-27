@@ -42,3 +42,5 @@ class Weapon extends Phaser.Sprite {
     }
 
 }
+
+export default Weapon;

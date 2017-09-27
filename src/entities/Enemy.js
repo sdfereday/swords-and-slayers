@@ -1,3 +1,11 @@
+// Actions
+import Idle from '../ai/nodes/actions/Idle';
+import Follow from '../ai/nodes/actions/Follow';
+
+// Conditions
+import InRange from '../ai/nodes/conditions/InRange';
+import OutOfRange from '../ai/nodes/conditions/OutOfRange';
+
 class Enemy extends Phaser.Sprite {
 
     constructor(game, x, y, name) {
@@ -95,3 +103,5 @@ class Enemy extends Phaser.Sprite {
     }
 
 }
+
+export default Enemy;

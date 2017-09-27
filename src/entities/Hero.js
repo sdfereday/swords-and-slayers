@@ -1,3 +1,6 @@
+import mix from '../helpers/Mix';
+import UserControlled from '../components/UserControlled';
+
 class Hero extends mix(Phaser.Sprite).with(UserControlled) {
 
     constructor(game, x, y, name) {
@@ -83,3 +86,5 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
     }
 
 }
+
+export default Hero;
