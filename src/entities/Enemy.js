@@ -1,3 +1,6 @@
+// Helpers
+import Helpers from '../helpers/Helpers';
+
 // Actions
 import Idle from '../ai/nodes/actions/Idle';
 import Follow from '../ai/nodes/actions/Follow';

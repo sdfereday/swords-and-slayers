@@ -1,8 +1,10 @@
 // Don't forget to specify '--config' when you're using your own config file, or it'll just break
 const webpack = require('webpack');
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 const path = require('path');
 
 let phaserModule = path.join(__dirname, '/node_modules/phaser-ce/');
+let b3Mod = path.join(__dirname, '/node_modules/behavior3js/');
 
 module.exports = {
     entry: {
@@ -17,13 +19,13 @@ module.exports = {
         path: path.resolve(__dirname, 'dist')
     },
     resolve: {
+        // modules: [path.resolve(__dirname, 'libs')],
         extensions: ['.js', '.jsx', '.json'],
-        modules: [path.resolve(__dirname, 'libs')],
         alias: {
             'phaser': path.join(phaserModule, 'build/custom/phaser-split.js'),
             'pixi': path.join(phaserModule, 'build/custom/pixi.js'),
             'p2': path.join(phaserModule, 'build/custom/p2.js'),
-            'b3': 'b3core.0.1.0.min.js'
+            'b3': path.join(b3Mod, 'libs/behavior3-0.2.2.js')
         }
     },
     module: {
@@ -59,6 +61,14 @@ module.exports = {
         new webpack.SourceMapDevToolPlugin({
             filename: '[file].map',
             exclude: 'vendor'
+        }),
+        new CircularDependencyPlugin({
+            exclude: /node_modules/,
+            failOnError: true
+        }),
+        new webpack.ProvidePlugin({
+            // It seems to fix the null ref issue, thought it's not reccommended (will look in to a better solution)
+            b3: 'b3'
         }),
         new webpack.optimize.UglifyJsPlugin({
             drop_console: false,
