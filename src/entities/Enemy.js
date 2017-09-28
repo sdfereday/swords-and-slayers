@@ -71,7 +71,7 @@ class Enemy extends Phaser.Sprite {
                     children: [
                         new Idle()
                     ]
-                })               
+                })
             ]
         });
 
@@ -84,9 +84,9 @@ class Enemy extends Phaser.Sprite {
         this.tree.tick(this, this.blackboard);
 
         if (this.currentTarget) {
-            let dist = Helpers.Dist(this, this.currentTarget);
-            this.blackboard.set('inRangeOfTarget', dist < this.config.alertRange);
-            this.blackboard.set('inRangeOfAttack', dist < this.config.attackRange);
+            let d = Helpers.distance(this, this.currentTarget);
+            this.blackboard.set('inRangeOfTarget', d < this.config.alertRange);
+            this.blackboard.set('inRangeOfAttack', d < this.config.attackRange);
         }
 
     }
@@ -118,7 +118,7 @@ class Enemy extends Phaser.Sprite {
 
     move(dir) {
 
-        if (Helpers.Dist(this, this.currentTarget) < 5)
+        if (Helpers.distance(this, this.currentTarget) < 5)
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;

@@ -1,5 +1,7 @@
 import mix from '../helpers/Mix';
+import Helpers from '../helpers/Helpers';
 import UserControlled from '../components/UserControlled';
+import Weapon from '../entities/Weapon';
 
 class Hero extends mix(Phaser.Sprite).with(UserControlled) {
 
@@ -46,18 +48,41 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         // Flag to track if the jump button is pressed
         this.jumping = false;
 
+        // Set the anchor
+        this.anchor.x = 0.5;
+
+        // Need to revise how to do this
+        this.activeWeapon = new Weapon(game, this.x / 2, this.y / 2, 'weapon-gfx');
+        this.addChild(this.activeWeapon);
+
+        this.activeWeapon.x -= this.activeWeapon.width;
+        this.activeWeapon.y += this.activeWeapon.height;
+
+        // Finally add those animations that we all love and enjoy
+        let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
+        let runAnim = this.animations.add('run', Helpers.numberArray(12, 18), 12, true);
+        let attackAnim = this.animations.add('attack', Helpers.numberArray(1, 3), 10, false);
+        let jumpAttackAnim = this.animations.add('jumpAttack', Helpers.numberArray(1, 2), 8, false);
+        let jumpAnim = this.animations.add('jump', [7], 8, false);
+        let fallAnim = this.animations.add('fall', [7], 8, false);
+
+        // This will make sure looped animations don't get in the way (experimental)
+        this.priorityAnimation = false;
+
+        // Anim events (pretty useful)
+        attackAnim.onComplete.add(this.onAnimationStopped, this);
+        jumpAttackAnim.onComplete.add(this.onAnimationStopped, this);
+
     }
 
     update() {
 
         if (this.leftInputIsActive()) {
-            // If the LEFT key is down, set the player velocity to move left
-            //this.body.acceleration.x = -this.ACCELERATION;
             this.body.velocity.x = -this.ACCELERATION;
+            this.scale.setTo(-1, 1);
         } else if (this.rightInputIsActive()) {
-            // If the RIGHT key is down, set the player velocity to move right
-            //this.body.acceleration.x = this.ACCELERATION;
             this.body.velocity.x = this.ACCELERATION;
+            this.scale.setTo(1, 1);  
         } else {
             this.body.velocity.x = 0;
         }
@@ -82,6 +107,56 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
             this.jumps--;
             this.jumping = false;
         }
+
+        // Play looped anims
+        if(!this.priorityAnimation)
+            this.animateContinuous();
+
+    }
+
+    attack() {
+
+        let currentAnim = null;
+
+        if(this.body.velocity.y != 0) {
+            currentAnim = this.animations.play('jumpAttack');
+        } else {
+            currentAnim = this.animations.play('attack');
+        }
+
+        this.priorityAnimation = true;
+
+        this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal));
+
+    }
+
+    animateContinuous() {
+
+        // Jumping
+        if(this.body.velocity.y != 0) {
+            
+            if(this.body.velocity.y > 0) {
+                this.animations.play('jump');
+            } else {
+                this.animations.play('fall');
+            }
+
+            return;
+
+        }
+
+        // Movement
+        if(this.body.velocity.x != 0) {
+            this.animations.play('run');
+        } else {
+            this.animations.play('idle');
+        }
+       
+    }
+
+    onAnimationStopped() {
+
+        this.priorityAnimation = false;
 
     }
 

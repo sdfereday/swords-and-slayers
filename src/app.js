@@ -5,7 +5,6 @@ import Phaser from 'phaser';
 // TODO: Move to factories
 import Hero from '../src/entities/Hero';
 import Enemy from '../src/entities/Enemy';
-import Weapon from '../src/entities/Weapon';
 
 //// TODO: Fix the problem with the relative import urls
 //// TODO: Convert to es6
@@ -48,10 +47,6 @@ function create() {
 
     this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
 
-    this.attackKey.onDown.add(function () {
-        this.activeWeapon.use();
-    }, this);
-
     // Create some ground for the player to walk on
     this.ground = this.game.add.group();
     for (var x = 0; x < this.game.width; x += 32) {
@@ -64,21 +59,7 @@ function create() {
     }
 
     this.hero = new Hero(game, 120, 100, 'player');
-    this.hero.frame = 1;
-
     this.hero.body.setSize(48, 48, 48, 80);
-
-    // Weapons attach to the player, but we make a reference here (easier to deal with)
-    let heroCenter = {
-        x: (this.hero.x / 2),
-        y: (this.hero.y / 2)
-    }
-
-    this.activeWeapon = new Weapon(game, heroCenter.x, heroCenter.y, 'weapon-gfx');
-    this.hero.addChild(this.activeWeapon);
-
-    this.activeWeapon.x += this.activeWeapon.width;
-    this.activeWeapon.y += this.activeWeapon.height;
 
     // This risks getting messy, just ensure that stuff is separated out per thing it does.
     this.enemies = game.add.group();
@@ -87,6 +68,11 @@ function create() {
 
     enemy.setTarget(this.hero);
 
+    // Bind some keys
+    this.attackKey.onDown.add(function () {
+        this.hero.attack();
+    }, this);
+
 }
 
 function update() {
@@ -94,7 +80,7 @@ function update() {
     this.game.physics.arcade.collide(this.hero, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.ground);
 
-    this.game.physics.arcade.overlap(this.activeWeapon, this.enemies, function (weapon, npc) {
+    this.game.physics.arcade.overlap(this.hero.activeWeapon, this.enemies, function (weapon, npc) {
         npc.takeDamage(weapon.damageOutput(), {
             x: weapon.x,
             y: weapon.y
