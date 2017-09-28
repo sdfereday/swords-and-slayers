@@ -18,6 +18,9 @@ class Weapon extends Phaser.Sprite {
             damageOutput: 1
         };
 
+        // Set the anchor
+        this.anchor.x = 0.5;
+
     }
 
     damageOutput() {
@@ -33,11 +36,11 @@ class Weapon extends Phaser.Sprite {
             return;
 
         this.body.enable = true;
-        this.alpha = 1;
+        //this.alpha = 1;
 
         this.game.time.events.add(time, () => {
             this.body.enable = false;
-            this.alpha = 0;
+            //this.alpha = 0;
         }, this);
 
     }

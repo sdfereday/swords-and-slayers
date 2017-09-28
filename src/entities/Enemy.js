@@ -42,6 +42,10 @@ class Enemy extends Phaser.Sprite {
 
         this.currentTarget = null;
         this.attacking = false;
+        this.disabled = false;
+        
+        // Set the anchor
+        this.anchor.x = 0.5;
 
         // There should probably be only one tree instance, not one per entity
         this.blackboard = new b3.Blackboard();
@@ -75,11 +79,16 @@ class Enemy extends Phaser.Sprite {
             ]
         });
 
+        // And again like player, some classy animations
+        let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
+        let runAnim = this.animations.add('run', Helpers.numberArray(12, 18), 12, true);
+
     }
 
     update() {
 
-        this.body.velocity.x = 0;
+        if(!this.disabled || this.disabled && this.body.velocity.y === 0)
+            this.body.velocity.x = 0;
 
         this.tree.tick(this, this.blackboard);
 
@@ -88,6 +97,10 @@ class Enemy extends Phaser.Sprite {
             this.blackboard.set('inRangeOfTarget', d < this.config.alertRange);
             this.blackboard.set('inRangeOfAttack', d < this.config.attackRange);
         }
+
+        // Play looped anims
+        if(!this.priorityAnimation)
+            this.animateContinuous();
 
     }
 
@@ -100,6 +113,9 @@ class Enemy extends Phaser.Sprite {
 
     attackTarget() {
 
+        if(this.disabled)
+            return;
+
         // You don't need promises here since attacks are precise times that don't rely on network latency
         console.log("Attack target start.");
         this.attacking = true;
@@ -109,19 +125,14 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    onAttackComplete() {
-        
-        console.log("Attack target finish.");
-        this.attacking = false;
-
-    }
-
     move(dir) {
 
-        if (Helpers.distance(this, this.currentTarget) < 5)
+        if (Helpers.distance(this, this.currentTarget) < 5 || this.disabled)
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
+
+        this.scale.setTo(dir, 1);
 
     }
 
@@ -138,10 +149,62 @@ class Enemy extends Phaser.Sprite {
 
     }
 
+    animateContinuous() {
+
+        if(this.disabled)
+            return;
+
+        // Movement
+        if(this.body.velocity.x != 0) {
+            this.animations.play('run');
+        } else {
+            this.animations.play('idle');
+        }
+        
+    }
+
+    onAttackComplete() {
+        
+        console.log("Attack target finish.");
+        this.attacking = false;
+
+    }
+
     takeDamage(n, origin) {
+
+        if(this.disabled)
+            return;
 
         console.log(this.name + " is taking damage: " + n);
         console.log(origin, "was origin of damage.");
+
+        // Some cheeky knockback
+        this.body.velocity.x = this.getTargetDirection(this.blackboard.get('currentTarget').x) * -300;
+        this.body.velocity.y = -300;
+
+        this.damageFlash();
+
+    }
+
+    damageFlash() {
+
+        this.disabled = true;
+        
+        this.alpha = 0;
+        this.tint = 0xffffff;
+
+        this.flashTween = this.game.add.tween(this).to( {
+            tint: 0xffeeff,
+            alpha: 1
+        }, 10, "Linear", true, 0, -1);
+        this.flashTween.yoyo(true, 10);
+
+        this.game.time.events.add(Phaser.Timer.SECOND * 0.6, function(){
+            this.disabled = false;
+            this.alpha = 1;
+            this.tint = 0xffffff;
+            this.flashTween.stop();
+        }, this);
 
     }
 

@@ -23,12 +23,12 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         };
 
         this.config = {
-            movementSpeed: 200
+            movementSpeed: 100 // unused
         };
 
         /////
         this.MAX_SPEED = 500; // pixels/second
-        this.ACCELERATION = 1500; // pixels/second/second
+        this.ACCELERATION = 400; // pixels/second/second
         this.DRAG = 600; // pixels/second
         this.GRAVITY = 2600; // pixels/second/second
         this.JUMP_SPEED = -700; // pixels/second (negative y is up)
@@ -55,8 +55,11 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         this.activeWeapon = new Weapon(game, this.x / 2, this.y / 2, 'weapon-gfx');
         this.addChild(this.activeWeapon);
 
-        this.activeWeapon.x -= this.activeWeapon.width;
+        //this.activeWeapon.x -= this.activeWeapon.width - (this.activeWeapon.width / 2);
         this.activeWeapon.y += this.activeWeapon.height;
+
+        // This is only temporary
+        this.activeWeapon.body.setSize(52, 64, -32, -16);
 
         // Finally add those animations that we all love and enjoy
         let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
@@ -80,9 +83,11 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         if (this.leftInputIsActive()) {
             this.body.velocity.x = -this.ACCELERATION;
             this.scale.setTo(-1, 1);
+            this.activeWeapon.scale.setTo(-1, 1);
         } else if (this.rightInputIsActive()) {
             this.body.velocity.x = this.ACCELERATION;
-            this.scale.setTo(1, 1);  
+            this.scale.setTo(1, 1);
+            this.activeWeapon.scale.setTo(1, 1);
         } else {
             this.body.velocity.x = 0;
         }

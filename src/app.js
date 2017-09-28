@@ -17,8 +17,13 @@ let game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
 
 function render() {
 
-    game.debug.bodyInfo(this.hero, 32, 32);
-    game.debug.body(this.hero);
+    // game.debug.bodyInfo(this.hero.activeWeapon, 32, 32);
+    // game.debug.body(this.hero.activeWeapon);
+
+    // this.enemies.children.forEach((e) => {
+    //     game.debug.bodyInfo(e, 32, 32);
+    //     game.debug.body(e);
+    // });
 
 }
 
@@ -59,11 +64,12 @@ function create() {
     }
 
     this.hero = new Hero(game, 120, 100, 'player');
-    this.hero.body.setSize(48, 48, 48, 80);
+    this.hero.body.setSize(48, 48, 38, 80);
 
     // This risks getting messy, just ensure that stuff is separated out per thing it does.
     this.enemies = game.add.group();
     let enemy = new Enemy(game, 90, 100, 'player');
+    enemy.body.setSize(48, 48, 38, 80);
     this.enemies.add(enemy);
 
     enemy.setTarget(this.hero);
