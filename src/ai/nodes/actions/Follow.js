@@ -1,21 +1,27 @@
 import 'b3';
 
-let Follow = b3.Class(b3.Action);
+class Follow extends b3.Action {
 
-Follow.prototype.name = 'Follow';
+    constructor() {
 
-Follow.prototype.open = function (tick) {
+        super();
+        this.name = 'Follow';
 
-    console.log("Follow...");
-    console.log(tick);
+    }
 
-};
+    open(tick) {
 
-Follow.prototype.tick = function (tick) {
+        console.log("Follow...");
+        console.log(tick);
 
-    tick.target.chaseTarget();
-    return b3.RUNNING;
+    }
 
-};
+    tick(tick) {
 
+        tick.target.chaseTarget();
+        return b3.RUNNING;
+
+    }
+
+}
 export default Follow;

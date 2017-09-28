@@ -1,22 +1,29 @@
 import 'b3';
 
-let Attack = b3.Class(b3.Action);
+class Attack extends b3.Action {
 
-Attack.prototype.name = 'Attack';
+    constructor() {
+        
+        super();
+        this.name = 'Attack';
 
-Attack.prototype.open = function (tick) {
+    }
 
-    console.log("Attack...");
-    console.log(tick);
+    open(tick) {
 
-    tick.target.attackTarget();
+        console.log("Attack...");
+        console.log(tick);
 
-};
+        tick.target.attackTarget();
 
-Attack.prototype.tick = function (tick) {
+    }
 
-    return tick.target.attacking ? b3.RUNNING : b3.SUCCESS;
+    tick(tick) {
 
-};
+        return tick.target.attacking ? b3.RUNNING : b3.SUCCESS;
+        
+    }
+
+}
 
 export default Attack;

@@ -1,16 +1,23 @@
 import 'b3';
 
-let InAttackRange = b3.Class(b3.Condition);
+class InAttackRange extends b3.Condition {
 
-InAttackRange.prototype.name = 'InAttackRange';
+    constructor() {
 
-InAttackRange.prototype.tick = function (tick) {
+        super();
+        this.name = 'InAttackRange';
 
-    if (tick.blackboard.get('inRangeOfAttack'))
-        return b3.SUCCESS;
+    }
 
-    return b3.FAILURE;
+    tick(tick) {
 
-};
+        if (tick.blackboard.get('inRangeOfAttack'))
+            return b3.SUCCESS;
+
+        return b3.FAILURE;
+
+    }
+
+}
 
 export default InAttackRange;

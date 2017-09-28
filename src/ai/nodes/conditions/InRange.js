@@ -1,16 +1,23 @@
 import 'b3';
 
-let InRange = b3.Class(b3.Condition);
+class InRange extends b3.Condition {
 
-InRange.prototype.name = 'InRange';
+    constructor() {
 
-InRange.prototype.tick = function (tick) {
+        super();
+        this.name = 'InRange';
 
-    if (tick.blackboard.get('inRangeOfTarget'))
-        return b3.SUCCESS;
+    }
 
-    return b3.FAILURE;
+    tick(tick) {
 
-};
+        if (tick.blackboard.get('inRangeOfTarget'))
+            return b3.SUCCESS;
+
+        return b3.FAILURE;
+
+    }
+
+}
 
 export default InRange;

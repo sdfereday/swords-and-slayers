@@ -1,19 +1,26 @@
 // https://github.com/renatopp/behavior3js/wiki/Core-04-Creating-Custom-Nodes
-let Idle = b3.Class(b3.Action);
+class Idle extends b3.Action {
 
-Idle.prototype.name = 'Idle';
+    constructor() {
 
-Idle.prototype.open = function (tick) {
+        super();
+        this.name = 'Idle';
 
-    console.log("Idle...");
-    console.log(tick);
+    }
 
-};
+    open(tick) {
 
-Idle.prototype.tick = function (tick) {
+        console.log("Idle...");
+        console.log(tick);
 
-    return b3.RUNNING;
+    }
 
-};
+    tick(tick) {
+
+        return b3.RUNNING;
+
+    }
+
+}
 
 export default Idle;
