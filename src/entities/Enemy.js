@@ -4,10 +4,11 @@ import Helpers from '../helpers/Helpers';
 // Actions
 import Idle from '../ai/nodes/actions/Idle';
 import Follow from '../ai/nodes/actions/Follow';
+import Attack from '../ai/nodes/actions/Attack';
 
 // Conditions
 import InRange from '../ai/nodes/conditions/InRange';
-import OutOfRange from '../ai/nodes/conditions/OutOfRange';
+import InAttackRange from '../ai/nodes/conditions/InAttackRange';
 
 class Enemy extends Phaser.Sprite {
 
@@ -30,25 +31,34 @@ class Enemy extends Phaser.Sprite {
 
         this.config = {
             movementSpeed: 200,
-            alertRange: 200
+            alertRange: 300,
+            attackRange: 100
+        };
+
+        // Current weapon is changeable per enemy (like the rest)
+        this.currentWeapon = {
+            animTime: 1000
         };
 
         this.currentTarget = null;
+        this.attacking = false;
 
         // There should probably be only one tree instance, not one per entity
         this.blackboard = new b3.Blackboard();
         this.tree = new b3.BehaviorTree();
 
         // https://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php
-        // http://behavior3js.guineashots.com/ -> When all children return true, priority will run on that parent
+        // http://behavior3js.guineashots.com/ -> When all children return true, priority will run on that parent, 
+        // order matters with this one I think.
         // Out of range would be better as a decorator.
         // You can load all this from JSON ultimately (see docs above)
         this.tree.root = new b3.Priority({
             children: [
                 new b3.Sequence({
                     children: [
-                        new OutOfRange(),
-                        new Idle()
+                        new InAttackRange(),
+                        new Attack(),
+
                     ]
                 }),
                 new b3.Sequence({
@@ -56,7 +66,12 @@ class Enemy extends Phaser.Sprite {
                         new InRange(),
                         new Follow()
                     ]
-                })
+                }),
+                new b3.Sequence({
+                    children: [
+                        new Idle()
+                    ]
+                })               
             ]
         });
 
@@ -71,14 +86,33 @@ class Enemy extends Phaser.Sprite {
         if (this.currentTarget) {
             let dist = Helpers.Dist(this, this.currentTarget);
             this.blackboard.set('inRangeOfTarget', dist < this.config.alertRange);
+            this.blackboard.set('inRangeOfAttack', dist < this.config.attackRange);
         }
 
     }
 
     chaseTarget() {
 
-        let dirToTarget = this.blackboard.get('currentTarget').x > this.x ? 1 : -1;
+        let dirToTarget = this.getTargetDirection(this.blackboard.get('currentTarget').x);
         this.move(dirToTarget);
+
+    }
+
+    attackTarget() {
+
+        // You don't need promises here since attacks are precise times that don't rely on network latency
+        console.log("Attack target start.");
+        this.attacking = true;
+
+        // TODO: Convert all set timeouts to something more efficient
+        setTimeout(this.onAttackComplete.bind(this), this.currentWeapon.animTime);
+
+    }
+
+    onAttackComplete() {
+        
+        console.log("Attack target finish.");
+        this.attacking = false;
 
     }
 
@@ -88,6 +122,12 @@ class Enemy extends Phaser.Sprite {
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
+
+    }
+
+    getTargetDirection(tx) {
+        
+        return tx > this.x ? 1 : -1;
 
     }
 
