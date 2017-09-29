@@ -37,7 +37,7 @@ function render() {
 
     // this.enemies.children.forEach((e) => {
     //     game.debug.bodyInfo(e, 32, 32);
-    //     game.debug.body(e);
+    //     game.debug.body(e.activeWeapon);
     // });
 
 }
@@ -80,15 +80,18 @@ function create() {
 
     // Make enemies and things
     this.enemies = game.add.group();
+    this.enemyWeapons = game.add.group();
 
     // TODO: Consider making the manifests available globally (no point making it complicated)
-    let enemies = mapData.enemies.map(function(d){
+    let enemies = mapData.enemies.map(function (d) {
         return CreatureFactory.make(d.id, d.pos, game);
     });
 
     enemies.forEach((creatureSprite) => {
         creatureSprite.setTarget(this.hero);
         this.enemies.add(creatureSprite);
+        if (creatureSprite.activeWeapon)
+            this.enemyWeapons.add(creatureSprite.activeWeapon);
     });
 
 }
@@ -100,6 +103,13 @@ function update() {
 
     this.game.physics.arcade.overlap(this.hero.activeWeapon, this.enemies, function (weapon, npc) {
         npc.takeDamage(weapon.damageOutput(), {
+            x: weapon.x,
+            y: weapon.y
+        });
+    }, null, this);
+
+    this.game.physics.arcade.overlap(this.hero, this.enemyWeapons, function (hero, weapon) {
+        hero.takeDamage(weapon.damageOutput(), {
             x: weapon.x,
             y: weapon.y
         });

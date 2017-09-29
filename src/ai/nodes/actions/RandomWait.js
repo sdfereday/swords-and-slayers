@@ -16,16 +16,17 @@ class RandomWait extends b3.Action {
         this.startTime = (new Date()).getTime();
         this.endTime = Helpers.getRandomInt(1, 3) * 1000;
 
+        console.log("Wait started.");
+
     }
 
     tick(tick) {
 
         var currTime = (new Date()).getTime();
 
-        console.log("Wait");
-
         if (currTime - this.startTime > this.endTime) {
-          //return b3.SUCCESS;
+          console.log("Wait complete.");
+          return b3.SUCCESS;
         }
     
         return b3.RUNNING;

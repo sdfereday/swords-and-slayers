@@ -17,6 +17,15 @@ class WorldBuilder {
             grp.add(groundBlock);
         }
 
+        for (var x = 512; x < this.game.width - 68; x += 32) {
+            // Add the ground blocks, enable physics on each, make them immovable
+            var groundBlock = this.game.add.sprite(x, this.game.height - 312, 'ground');
+            this.game.physics.enable(groundBlock, Phaser.Physics.ARCADE);
+            groundBlock.body.immovable = true;
+            groundBlock.body.allowGravity = false;
+            grp.add(groundBlock);
+        }
+
         return grp;
 
     }

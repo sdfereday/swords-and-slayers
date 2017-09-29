@@ -11,6 +11,9 @@ import Attack from '../ai/nodes/actions/Attack';
 import Roam from '../ai/nodes/actions/Roam';
 import RandomWait from '../ai/nodes/actions/RandomWait';
 
+// Composites
+import SequenceSynced from '../ai/nodes/composites/SequenceSynced';
+
 // Conditions
 import InRange from '../ai/nodes/conditions/InRange';
 import InAttackRange from '../ai/nodes/conditions/InAttackRange';
@@ -57,10 +60,14 @@ class Enemy extends Phaser.Sprite {
 
     update() {
 
+        // Since enemy gets added to a group, and so does active weapon, you can't 'add child'
+        // a sprite to a sprite in phaser as it's become a child of another group. So this has to be done instead sadly:
+        this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
+
         if (!this.disabled || this.disabled && this.body.velocity.y === 0)
             this.body.velocity.x = 0;
 
-        if(!this.busy)
+        if (!this.busy)
             this.tree.tick(this, this.blackboard);
 
         if (this.currentTarget) {
@@ -85,7 +92,13 @@ class Enemy extends Phaser.Sprite {
 
     setWeapon(weaponData) {
 
-        this.activeWeapon = new Weapon(this.game, this.x / 2, this.y / 2, weaponData.sprite);
+        // Need to revise how to do this
+        this.activeWeapon = new Weapon(this.game, 0, 0, 'weapon-gfx');
+        this.activeWeapon.y += this.activeWeapon.height;
+
+        // This is only temporary
+        this.activeWeapon.body.setSize(48, 64, 32, 32);
+
         return this;
 
     }
@@ -110,13 +123,13 @@ class Enemy extends Phaser.Sprite {
         // You can load all this from JSON ultimately (see docs above)
         this.tree.root = new b3.Priority({
             children: [
-                // new BoolCheck('inRangeOfAttack', {
-                //     child: new Attack()
-                // }),
-                // new BoolCheck('inRangeOfTarget', {
-                //     child: new Follow()
-                // }),
-                new b3.Sequence({
+                new BoolCheck('inRangeOfAttack', {
+                    child: new Attack()
+                }),
+                new BoolCheck('inRangeOfTarget', {
+                    child: new Follow()
+                }),
+                new SequenceSynced({
                     children: [
                         new Roam(true),
                         new RandomWait()
@@ -131,8 +144,7 @@ class Enemy extends Phaser.Sprite {
 
     chaseTarget() {
 
-        let dirToTarget = this.getTargetDirection(this.blackboard.get('currentTarget').x);
-        this.move(dirToTarget);
+        this.move(this.getTargetDirection(this.blackboard.get('currentTarget').x));
 
     }
 
@@ -144,6 +156,7 @@ class Enemy extends Phaser.Sprite {
         this.busy = true;
         this.priorityAnimation = true;
 
+        // TODO: Remove magic numbers
         let currentAnim = this.animations.getAnimation('attack'),
             attackStartDelay = Helpers.getRandomInt(200, 500),
             attackEndDelay = Helpers.getRandomInt(200, 500);
@@ -163,23 +176,28 @@ class Enemy extends Phaser.Sprite {
 
     move(dir) {
 
-        if (Helpers.distance(this, this.currentTarget) < 5 || this.disabled)
+        if (Helpers.distance(this, this.currentTarget) < this.width / 2 || this.disabled)
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
 
         this.scale.setTo(dir, 1);
+        this.activeWeapon.scale.setTo(dir, 1);
 
     }
 
     moveTo(pos) {
 
+        if (this.disabled)
+            return;
+
         let dir = this.getTargetDirection(pos.x);
-        
+
         // TODO: Might be nice to have a walking anim too.
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
-        
-        this.scale.setTo(dir, 1);       
+
+        this.scale.setTo(dir, 1);
+        this.activeWeapon.scale.setTo(dir, 1);
 
     }
 

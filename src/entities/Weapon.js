@@ -47,6 +47,13 @@ class Weapon extends Phaser.Sprite {
 
     }
 
+    anchorTo(x, y) {
+        
+        this.x = x;
+        this.y = y;
+
+    }
+
 }
 
 export default Weapon;

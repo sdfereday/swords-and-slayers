@@ -26,6 +26,8 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
             movementSpeed: 100 // unused
         };
 
+        this.disabled = false;
+
         /////
         this.MAX_SPEED = 500; // pixels/second
         this.ACCELERATION = 400; // pixels/second/second
@@ -52,14 +54,11 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         this.anchor.x = 0.5;
 
         // Need to revise how to do this
-        this.activeWeapon = new Weapon(game, this.x / 2, this.y / 2, 'weapon-gfx');
-        this.addChild(this.activeWeapon);
-
-        //this.activeWeapon.x -= this.activeWeapon.width - (this.activeWeapon.width / 2);
+        this.activeWeapon = new Weapon(game, 0, 0, 'weapon-gfx');
         this.activeWeapon.y += this.activeWeapon.height;
 
         // This is only temporary
-        this.activeWeapon.body.setSize(52, 64, -32, -16);
+        this.activeWeapon.body.setSize(48, 64, 32, 32);
 
         // Finally add those animations that we all love and enjoy
         let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
@@ -79,6 +78,11 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
     }
 
     update() {
+
+        if (this.disabled)
+            return;
+
+        this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
         if (this.leftInputIsActive()) {
             this.body.velocity.x = -this.ACCELERATION;
@@ -114,17 +118,18 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         }
 
         // Play looped anims
-        if(!this.priorityAnimation)
+        if (!this.priorityAnimation)
             this.animateContinuous();
 
     }
 
+    // TODO: All below can be moved in to components
     attack() {
 
         let currentAnim = null;
         this.priorityAnimation = true;
 
-        if(this.body.velocity.y != 0) {
+        if (this.body.velocity.y !== 0) {
             currentAnim = this.animations.play('jumpAttack');
         } else {
             currentAnim = this.animations.play('attack');
@@ -137,9 +142,9 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
     animateContinuous() {
 
         // Jumping
-        if(this.body.velocity.y != 0) {
-            
-            if(this.body.velocity.y > 0) {
+        if (this.body.velocity.y != 0) {
+
+            if (this.body.velocity.y > 0) {
                 this.animations.play('jump');
             } else {
                 this.animations.play('fall');
@@ -150,17 +155,61 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         }
 
         // Movement
-        if(this.body.velocity.x != 0) {
+        if (this.body.velocity.x != 0) {
             this.animations.play('run');
         } else {
             this.animations.play('idle');
         }
-       
+
     }
 
     onAnimationStopped() {
 
         this.priorityAnimation = false;
+
+    }
+
+    getTargetDirection(tx) {
+
+        return tx > this.x ? 1 : -1;
+
+    }
+
+    takeDamage(n, origin) {
+
+        if (this.disabled)
+            return;
+
+        console.log(this.name + " is taking damage: " + n);
+        console.log(origin, "was origin of damage.");
+
+        // Some cheeky knockback
+        this.body.velocity.x = this.getTargetDirection(origin.x) * -300;
+        this.body.velocity.y = -300;
+
+        this.damageFlash();
+
+    }
+
+    damageFlash() {
+
+        this.disabled = true;
+
+        this.alpha = 0;
+        this.tint = 0xffffff;
+
+        this.flashTween = this.game.add.tween(this).to({
+            tint: 0xffeeff,
+            alpha: 1
+        }, 10, "Linear", true, 0, -1);
+        this.flashTween.yoyo(true, 10);
+
+        this.game.time.events.add(Phaser.Timer.SECOND * 0.2, function () {
+            this.disabled = false;
+            this.alpha = 1;
+            this.tint = 0xffffff;
+            this.flashTween.stop();
+        }, this);
 
     }
 

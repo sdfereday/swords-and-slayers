@@ -22,15 +22,13 @@ class Roam extends b3.Action {
 
     open(tick) {
 
-        tick.target.stop();
-
         this.currentLocation.x = tick.target.x;
         this.currentLocation.y = tick.target.y;
 
-        this.destination.x = tick.target.x;
+        this.destination.x = Helpers.getRandomInt(30, 770);
         this.destination.y = tick.target.y;
-
-        console.log("Roam");
+        
+        console.log("Roam started...");
 
     }
 
@@ -42,9 +40,12 @@ class Roam extends b3.Action {
         tick.target.moveTo(this.destination);
 
         if (Helpers.distance({ x: tick.target.x, y: tick.target.y }, this.destination) < 30) {
-            //tick.target.stop();
+            tick.target.stop();
+            console.log("Destination reached.");
             return b3.SUCCESS;
         }
+
+        console.log("Roaming...");
 
         return b3.RUNNING;
 
