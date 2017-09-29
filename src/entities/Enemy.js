@@ -166,8 +166,12 @@ class Enemy extends Phaser.Sprite {
             // We don't play the animation 'until' the attack starts :P
             currentAnim.play();
 
-            this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal) + attackEndDelay, () => {
-                this.busy = false;
+            this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal), () => {
+
+                this.game.time.events.add(attackEndDelay, () => {
+                    this.busy = false;                    
+                }, this);
+
             });
 
         }, this);
@@ -176,7 +180,7 @@ class Enemy extends Phaser.Sprite {
 
     move(dir) {
 
-        if (Helpers.distance(this, this.currentTarget) < this.width / 2 || this.disabled)
+        if (Helpers.distance(this, this.currentTarget) < this.width / 3 || this.disabled)
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;

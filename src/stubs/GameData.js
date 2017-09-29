@@ -35,8 +35,8 @@ const gameData = {
             config: {
                 value: {
                     movementSpeed: 200,
-                    alertRange: 256,
-                    attackRange: 80
+                    alertRange: 300,
+                    attackRange: 60
                 }
             }
         }
