@@ -11,16 +11,13 @@ class Attack extends b3.Action {
 
     open(tick) {
 
-        console.log("Attack...");
-        console.log(tick);
-
         tick.target.attackTarget();
 
     }
 
     tick(tick) {
-
-        return tick.target.attacking ? b3.RUNNING : b3.SUCCESS;
+        
+        return tick.target.busy ? b3.RUNNING : b3.SUCCESS;
         
     }
 

@@ -1,14 +1,22 @@
 // Helpers
 import Helpers from '../helpers/Helpers';
 
+// Equipment
+import Weapon from '../entities/Weapon';
+
 // Actions
 import Idle from '../ai/nodes/actions/Idle';
 import Follow from '../ai/nodes/actions/Follow';
 import Attack from '../ai/nodes/actions/Attack';
+import Roam from '../ai/nodes/actions/Roam';
+import RandomWait from '../ai/nodes/actions/RandomWait';
 
 // Conditions
 import InRange from '../ai/nodes/conditions/InRange';
 import InAttackRange from '../ai/nodes/conditions/InAttackRange';
+
+// Decorators
+import BoolCheck from '../ai/nodes/decorators/BoolCheck';
 
 class Enemy extends Phaser.Sprite {
 
@@ -20,32 +28,76 @@ class Enemy extends Phaser.Sprite {
         game.add.existing(this);
         game.physics.arcade.enable(this);
 
-        // Custom stats and things
-        this.id = "???";
-        this.name = name;
+        // Custom data for this entity (fixed as this, should be deterministic)
+        this.config = {};
+        this.stats = {};
+        this.equipment = {};
+        this.activeWeapon = {};
 
-        this.stats = {
-            hp: 4,
-            maxHp: 4
-        };
-
-        this.config = {
-            movementSpeed: 200,
-            alertRange: 300,
-            attackRange: 100
-        };
-
-        // Current weapon is changeable per enemy (like the rest)
-        this.currentWeapon = {
-            animTime: 1000
-        };
-
+        // These persist across all entities
         this.currentTarget = null;
-        this.attacking = false;
+        this.busy = false;
         this.disabled = false;
-        
+
         // Set the anchor
         this.anchor.x = 0.5;
+
+        // Initialize some animations
+        let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
+        let runAnim = this.animations.add('run', Helpers.numberArray(12, 18), 12, true);
+        let attackAnim = this.animations.add('attack', Helpers.numberArray(1, 3), 10, false);
+
+        // This will make sure looped animations don't get in the way (experimental)
+        this.priorityAnimation = false;
+
+        // Anim events (pretty useful)
+        attackAnim.onComplete.add(this.onAnimationStopped, this);
+
+    }
+
+    update() {
+
+        if (!this.disabled || this.disabled && this.body.velocity.y === 0)
+            this.body.velocity.x = 0;
+
+        if(!this.busy)
+            this.tree.tick(this, this.blackboard);
+
+        if (this.currentTarget) {
+            let d = Helpers.distance(this, this.currentTarget);
+            this.blackboard.set('inRangeOfTarget', d < this.config.alertRange);
+            this.blackboard.set('inRangeOfAttack', d < this.config.attackRange);
+        }
+
+        // Play looped anims
+        if (!this.priorityAnimation)
+            this.animateContinuous();
+
+    }
+
+    // TODO: All below can be moved in to components
+    setData(data) {
+
+        Object.defineProperties(this, data);
+        return this;
+
+    }
+
+    setWeapon(weaponData) {
+
+        this.activeWeapon = new Weapon(this.game, this.x / 2, this.y / 2, weaponData.sprite);
+        return this;
+
+    }
+
+    setBody(bodyData) {
+
+        this.body.setSize(bodyData.x, bodyData.y, bodyData.w, bodyData.h);
+        return this;
+
+    }
+
+    initializeAI() {
 
         // There should probably be only one tree instance, not one per entity
         this.blackboard = new b3.Blackboard();
@@ -58,49 +110,22 @@ class Enemy extends Phaser.Sprite {
         // You can load all this from JSON ultimately (see docs above)
         this.tree.root = new b3.Priority({
             children: [
+                // new BoolCheck('inRangeOfAttack', {
+                //     child: new Attack()
+                // }),
+                // new BoolCheck('inRangeOfTarget', {
+                //     child: new Follow()
+                // }),
                 new b3.Sequence({
                     children: [
-                        new InAttackRange(),
-                        new Attack(),
-
-                    ]
-                }),
-                new b3.Sequence({
-                    children: [
-                        new InRange(),
-                        new Follow()
-                    ]
-                }),
-                new b3.Sequence({
-                    children: [
-                        new Idle()
+                        new Roam(true),
+                        new RandomWait()
                     ]
                 })
             ]
         });
 
-        // And again like player, some classy animations
-        let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
-        let runAnim = this.animations.add('run', Helpers.numberArray(12, 18), 12, true);
-
-    }
-
-    update() {
-
-        if(!this.disabled || this.disabled && this.body.velocity.y === 0)
-            this.body.velocity.x = 0;
-
-        this.tree.tick(this, this.blackboard);
-
-        if (this.currentTarget) {
-            let d = Helpers.distance(this, this.currentTarget);
-            this.blackboard.set('inRangeOfTarget', d < this.config.alertRange);
-            this.blackboard.set('inRangeOfAttack', d < this.config.attackRange);
-        }
-
-        // Play looped anims
-        if(!this.priorityAnimation)
-            this.animateContinuous();
+        return this;
 
     }
 
@@ -113,15 +138,26 @@ class Enemy extends Phaser.Sprite {
 
     attackTarget() {
 
-        if(this.disabled)
+        if (this.disabled || this.busy)
             return;
 
-        // You don't need promises here since attacks are precise times that don't rely on network latency
-        console.log("Attack target start.");
-        this.attacking = true;
+        this.busy = true;
+        this.priorityAnimation = true;
 
-        // TODO: Convert all set timeouts to something more efficient
-        setTimeout(this.onAttackComplete.bind(this), this.currentWeapon.animTime);
+        let currentAnim = this.animations.getAnimation('attack'),
+            attackStartDelay = Helpers.getRandomInt(200, 500),
+            attackEndDelay = Helpers.getRandomInt(200, 500);
+
+        this.game.time.events.add(attackStartDelay, () => {
+
+            // We don't play the animation 'until' the attack starts :P
+            currentAnim.play();
+
+            this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal) + attackEndDelay, () => {
+                this.busy = false;
+            });
+
+        }, this);
 
     }
 
@@ -136,8 +172,25 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    getTargetDirection(tx) {
+    moveTo(pos) {
+
+        let dir = this.getTargetDirection(pos.x);
         
+        // TODO: Might be nice to have a walking anim too.
+        this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
+        
+        this.scale.setTo(dir, 1);       
+
+    }
+
+    stop() {
+
+        this.body.velocity.x = 0;
+
+    }
+
+    getTargetDirection(tx) {
+
         return tx > this.x ? 1 : -1;
 
     }
@@ -151,28 +204,27 @@ class Enemy extends Phaser.Sprite {
 
     animateContinuous() {
 
-        if(this.disabled)
+        if (this.disabled)
             return;
 
         // Movement
-        if(this.body.velocity.x != 0) {
+        if (this.body.velocity.x != 0) {
             this.animations.play('run');
         } else {
             this.animations.play('idle');
         }
-        
+
     }
 
-    onAttackComplete() {
-        
-        console.log("Attack target finish.");
-        this.attacking = false;
+    onAnimationStopped() {
+
+        this.priorityAnimation = false;
 
     }
 
     takeDamage(n, origin) {
 
-        if(this.disabled)
+        if (this.disabled)
             return;
 
         console.log(this.name + " is taking damage: " + n);
@@ -189,17 +241,17 @@ class Enemy extends Phaser.Sprite {
     damageFlash() {
 
         this.disabled = true;
-        
+
         this.alpha = 0;
         this.tint = 0xffffff;
 
-        this.flashTween = this.game.add.tween(this).to( {
+        this.flashTween = this.game.add.tween(this).to({
             tint: 0xffeeff,
             alpha: 1
         }, 10, "Linear", true, 0, -1);
         this.flashTween.yoyo(true, 10);
 
-        this.game.time.events.add(Phaser.Timer.SECOND * 0.6, function(){
+        this.game.time.events.add(Phaser.Timer.SECOND * 0.6, function () {
             this.disabled = false;
             this.alpha = 1;
             this.tint = 0xffffff;

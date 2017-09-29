@@ -10,7 +10,7 @@ class Helpers {
     }
 
     // -> http://davidarvelo.com/blog/array-number-range-sequences-in-javascript-es6/
-    static numberArray (begin, end) {
+    static numberArray(begin, end) {
         let arr = [];
         for (let i = begin; i < end; i += 1) {
             arr.push(i);
@@ -18,8 +18,14 @@ class Helpers {
         return arr;
     }
 
-    static animDuration (fps, frameNum) {
+    static animDuration(fps, frameNum) {
         return (fps * frameNum) * 10;
+    }
+
+    static getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
     }
 
 }

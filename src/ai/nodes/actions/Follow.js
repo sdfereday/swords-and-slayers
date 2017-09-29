@@ -11,8 +11,8 @@ class Follow extends b3.Action {
 
     open(tick) {
 
-        console.log("Follow...");
-        console.log(tick);
+        // console.log("Follow...");
+        // console.log(tick);
 
     }
 

@@ -122,14 +122,13 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
     attack() {
 
         let currentAnim = null;
+        this.priorityAnimation = true;
 
         if(this.body.velocity.y != 0) {
             currentAnim = this.animations.play('jumpAttack');
         } else {
             currentAnim = this.animations.play('attack');
         }
-
-        this.priorityAnimation = true;
 
         this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal));
 

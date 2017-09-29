@@ -10,8 +10,8 @@ class Idle extends b3.Action {
 
     open(tick) {
 
-        console.log("Idle...");
-        console.log(tick);
+        // console.log("Idle...");
+        // console.log(tick);
 
     }
 

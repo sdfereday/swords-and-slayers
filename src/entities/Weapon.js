@@ -27,7 +27,7 @@ class Weapon extends Phaser.Sprite {
         return this.stats.damageOutput;
     }
 
-    use(time) {
+    use(time, onComplete) {
 
         // TODO: To clean up properly. :P It'd be pretty useful to sniff the animation for it to get the timings.
         // Don't forget though, the weapon must sync with the thing that's using it (as if it's attached), can make
@@ -41,6 +41,8 @@ class Weapon extends Phaser.Sprite {
         this.game.time.events.add(time, () => {
             this.body.enable = false;
             //this.alpha = 0;
+            if(typeof onComplete === 'function')
+                onComplete.call(this);
         }, this);
 
     }

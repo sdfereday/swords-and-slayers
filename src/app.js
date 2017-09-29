@@ -2,9 +2,24 @@ import 'pixi';
 import 'p2';
 import Phaser from 'phaser';
 
-// TODO: Move to factories
+import WorldBuilder from '../src/world/WorldBuilder';
+import CreatureFactory from '../src/factories/CreatureFactory';
+
+// ...
 import Hero from '../src/entities/Hero';
-import Enemy from '../src/entities/Enemy';
+
+// Some test map data
+const mapData = {
+    enemies: [
+        {
+            id: 'bug',
+            pos: {
+                x: 150,
+                y: 100
+            }
+        }
+    ]
+};
 
 //// TODO: Fix the problem with the relative import urls
 //// TODO: Convert to es6
@@ -31,7 +46,6 @@ function preload() {
 
     game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 18);
     game.load.image('ground', 'resources/Game/platform tile2.png', 32, 32);
-    // game.load.spritesheet('veggies', 'assets/sprites/fruitnveg32wh37.png', 32, 32);
 
 }
 
@@ -52,32 +66,30 @@ function create() {
 
     this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
 
-    // Create some ground for the player to walk on
-    this.ground = this.game.add.group();
-    for (var x = 0; x < this.game.width; x += 32) {
-        // Add the ground blocks, enable physics on each, make them immovable
-        var groundBlock = this.game.add.sprite(x, this.game.height - 32, 'ground');
-        this.game.physics.enable(groundBlock, Phaser.Physics.ARCADE);
-        groundBlock.body.immovable = true;
-        groundBlock.body.allowGravity = false;
-        this.ground.add(groundBlock);
-    }
+    // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
+    this.ground = new WorldBuilder(game).makeTest();
 
-    this.hero = new Hero(game, 120, 100, 'player');
+    // Make entities
+    this.hero = new Hero(game, 700, 100, 'player');
     this.hero.body.setSize(48, 48, 38, 80);
-
-    // This risks getting messy, just ensure that stuff is separated out per thing it does.
-    this.enemies = game.add.group();
-    let enemy = new Enemy(game, 90, 100, 'player');
-    enemy.body.setSize(48, 48, 38, 80);
-    this.enemies.add(enemy);
-
-    enemy.setTarget(this.hero);
 
     // Bind some keys
     this.attackKey.onDown.add(function () {
         this.hero.attack();
     }, this);
+
+    // Make enemies and things
+    this.enemies = game.add.group();
+
+    // TODO: Consider making the manifests available globally (no point making it complicated)
+    let enemies = mapData.enemies.map(function(d){
+        return CreatureFactory.make(d.id, d.pos, game);
+    });
+
+    enemies.forEach((creatureSprite) => {
+        creatureSprite.setTarget(this.hero);
+        this.enemies.add(creatureSprite);
+    });
 
 }
 
