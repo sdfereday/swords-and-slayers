@@ -28,6 +28,12 @@ class Helpers {
         return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
     }
 
+    static getTargetDirection(tx, ownerx) {
+
+        return tx > ownerx ? 1 : -1;
+
+    }
+
 }
 
 export default Helpers;

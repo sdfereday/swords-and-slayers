@@ -2,6 +2,7 @@ import 'pixi';
 import 'p2';
 import Phaser from 'phaser';
 
+import GameData from '../src/stubs/GameData';
 import WorldBuilder from '../src/world/WorldBuilder';
 import CreatureFactory from '../src/factories/CreatureFactory';
 
@@ -53,6 +54,8 @@ function preload() {
 function create() {
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.arcade.gravity.y = 2000; // pixels/second/second
+
     this.game.stage.backgroundColor = '#2d2d2d';
 
     // Capture certain keys to prevent their default actions in the browser.
@@ -71,8 +74,15 @@ function create() {
     this.ground = new WorldBuilder(game).makeTest();
 
     // Make entities
-    this.hero = new Hero(game, 700, 100, 'player');
-    this.hero.body.setSize(48, 48, 38, 80);
+    this.hero = new Hero(game, 700, 100, GameData.player.sprite, {
+        config: GameData.player.config,
+        stats: GameData.player.stats,
+        equipment: GameData.player.equipment
+    });
+
+    this.hero.registerAnimations(GameData.player.animations);
+    this.hero.setWeapon(GameData.weapons.find(x => x.id === GameData.player.equipment.value.primaryWeapon));
+    this.hero.setBody(GameData.player.body);
 
     // Bind some keys
     this.attackKey.onDown.add(function () {

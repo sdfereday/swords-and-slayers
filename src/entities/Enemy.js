@@ -1,4 +1,4 @@
-// Helpers
+import mix from '../helpers/Mix';
 import Helpers from '../helpers/Helpers';
 
 // Equipment
@@ -21,9 +21,13 @@ import InAttackRange from '../ai/nodes/conditions/InAttackRange';
 // Decorators
 import BoolCheck from '../ai/nodes/decorators/BoolCheck';
 
-class Enemy extends Phaser.Sprite {
+// Effects
+import Animator from '../animation/Animator';
+import HitEffects from '../components/HitEffects';
 
-    constructor(game, x, y, name) {
+class Enemy extends mix(Phaser.Sprite).with(HitEffects) {
+
+    constructor(game, x, y, name, data) {
 
         // Phaser requires all of these to happen
         super(game, x, y, name);
@@ -37,24 +41,24 @@ class Enemy extends Phaser.Sprite {
         this.equipment = {};
         this.activeWeapon = {};
 
-        // These persist across all entities
+        // Define properties with supplied data (TODO: Revise method)
+        if (data) {
+            Object.defineProperties(this, data);
+        }
+
+        // Important to enemies
         this.currentTarget = null;
+
+        // Flags
         this.busy = false;
         this.disabled = false;
+        this.jumping = false;
 
         // Set the anchor
         this.anchor.x = 0.5;
 
-        // Initialize some animations
-        let idleAnim = this.animations.add('idle', Helpers.numberArray(3, 6), 3, true);
-        let runAnim = this.animations.add('run', Helpers.numberArray(12, 18), 12, true);
-        let attackAnim = this.animations.add('attack', Helpers.numberArray(1, 3), 10, false);
-
-        // This will make sure looped animations don't get in the way (experimental)
-        this.priorityAnimation = false;
-
-        // Anim events (pretty useful)
-        attackAnim.onComplete.add(this.onAnimationStopped, this);
+        // Animations setup
+        this.animator = new Animator(this.animations);
 
     }
 
@@ -77,19 +81,12 @@ class Enemy extends Phaser.Sprite {
         }
 
         // Play looped anims
-        if (!this.priorityAnimation)
-            this.animateContinuous();
+        this.animate();
 
     }
 
     // TODO: All below can be moved in to components
-    setData(data) {
-
-        Object.defineProperties(this, data);
-        return this;
-
-    }
-
+    /// Data setup and init ///
     setWeapon(weaponData) {
 
         // Need to revise how to do this
@@ -142,44 +139,7 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    chaseTarget() {
-
-        this.move(this.getTargetDirection(this.blackboard.get('currentTarget').x));
-
-    }
-
-    attackTarget() {
-
-        if (this.disabled || this.busy)
-            return;
-
-        this.faceTarget(this.currentTarget);
-
-        this.busy = true;
-        this.priorityAnimation = true;
-
-        // TODO: Remove magic numbers
-        let currentAnim = this.animations.getAnimation('attack'),
-            attackStartDelay = Helpers.getRandomInt(200, 500),
-            attackEndDelay = Helpers.getRandomInt(200, 500);
-
-        this.game.time.events.add(attackStartDelay, () => {
-
-            // We don't play the animation 'until' the attack starts :P
-            currentAnim.play();
-
-            this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal), () => {
-
-                this.game.time.events.add(attackEndDelay, () => {
-                    this.busy = false;                    
-                }, this);
-
-            });
-
-        }, this);
-
-    }
-
+    /// Automatic Movement ///
     move(dir) {
 
         if (Helpers.distance(this, this.currentTarget) < this.width / 3 || this.disabled || this.targetWithinBounds())
@@ -197,7 +157,7 @@ class Enemy extends Phaser.Sprite {
         if (this.disabled)
             return;
 
-        let dir = this.getTargetDirection(pos.x);
+        let dir = Helpers.getTargetDirection(pos.x, this.x);
 
         // TODO: Might be nice to have a walking anim too.
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
@@ -207,9 +167,16 @@ class Enemy extends Phaser.Sprite {
 
     }
 
+    stop() {
+
+        this.body.velocity.x = 0;
+
+    }
+
+    /// Targeting ///
     faceTarget(pos) {
 
-        let dir = this.getTargetDirection(pos.x);
+        let dir = Helpers.getTargetDirection(pos.x, this.x);
 
         this.scale.setTo(dir, 1);
         this.activeWeapon.scale.setTo(dir, 1);
@@ -223,18 +190,6 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    stop() {
-
-        this.body.velocity.x = 0;
-
-    }
-
-    getTargetDirection(tx) {
-
-        return tx > this.x ? 1 : -1;
-
-    }
-
     setTarget(t) {
 
         this.currentTarget = t;
@@ -242,26 +197,46 @@ class Enemy extends Phaser.Sprite {
 
     }
 
-    animateContinuous() {
+    /// Actions ////
+    chaseTarget() {
 
-        if (this.disabled)
+        this.move(Helpers.getTargetDirection(this.blackboard.get('currentTarget').x, this.x));
+
+    }
+
+    attackTarget() {
+
+        if (this.disabled || this.busy)
             return;
 
-        // Movement
-        if (this.body.velocity.x != 0) {
-            this.animations.play('run');
-        } else {
-            this.animations.play('idle');
-        }
+        this.faceTarget(this.currentTarget);
+
+        this.busy = true;
+        this.priorityAnimation = true;
+
+        // TODO: Remove magic numbers
+        let currentAnim = this.animator.getAnimation('attack'),
+            attackStartDelay = Helpers.getRandomInt(200, 500),
+            attackEndDelay = Helpers.getRandomInt(200, 500);
+
+        this.game.time.events.add(attackStartDelay, () => {
+
+            // We don't play the animation 'until' the attack starts :P
+            this.animator.play('attack');
+
+            this.activeWeapon.use(Helpers.animDuration(currentAnim.speed, currentAnim.frameTotal), () => {
+
+                this.game.time.events.add(attackEndDelay, () => {
+                    this.busy = false;
+                }, this);
+
+            });
+
+        }, this);
 
     }
 
-    onAnimationStopped() {
-
-        this.priorityAnimation = false;
-
-    }
-
+    /// Feedback ///
     takeDamage(n, origin) {
 
         if (this.disabled)
@@ -271,32 +246,32 @@ class Enemy extends Phaser.Sprite {
         console.log(origin, "was origin of damage.");
 
         // Some cheeky knockback
-        this.body.velocity.x = this.getTargetDirection(this.blackboard.get('currentTarget').x) * -300;
+        this.body.velocity.x = Helpers.getTargetDirection(this.blackboard.get('currentTarget').x, this.x) * -300;
         this.body.velocity.y = -300;
 
         this.damageFlash();
 
     }
 
-    damageFlash() {
+    /// Animations ///
+    registerAnimations(data) {
 
-        this.disabled = true;
+        this.animator.registerMany(data);
+        return this;
 
-        this.alpha = 0;
-        this.tint = 0xffffff;
+    }
 
-        this.flashTween = this.game.add.tween(this).to({
-            tint: 0xffeeff,
-            alpha: 1
-        }, 10, "Linear", true, 0, -1);
-        this.flashTween.yoyo(true, 10);
+    animate() {
 
-        this.game.time.events.add(Phaser.Timer.SECOND * 0.6, function () {
-            this.disabled = false;
-            this.alpha = 1;
-            this.tint = 0xffffff;
-            this.flashTween.stop();
-        }, this);
+        if (this.disabled)
+            return;
+
+        // Movement
+        if (this.body.velocity.x != 0) {
+            this.animator.play('run');
+        } else {
+            this.animator.play('idle');
+        }
 
     }
 
