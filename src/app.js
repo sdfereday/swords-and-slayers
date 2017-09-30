@@ -44,7 +44,8 @@ function render() {
 
 function preload() {
 
-    game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 18);
+    game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 20);
+    game.load.spritesheet('enemy', 'resources/Game/enemy.png', 128, 128, 20);
     game.load.image('ground', 'resources/Game/platform tile2.png', 32, 32);
 
 }

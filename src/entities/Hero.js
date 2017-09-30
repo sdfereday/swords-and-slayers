@@ -66,7 +66,7 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         let attackAnim = this.animations.add('attack', Helpers.numberArray(1, 3), 10, false);
         let jumpAttackAnim = this.animations.add('jumpAttack', Helpers.numberArray(1, 2), 8, false);
         let jumpAnim = this.animations.add('jump', [7], 8, false);
-        let fallAnim = this.animations.add('fall', [7], 8, false);
+        let fallAnim = this.animations.add('fall', [18], 8, false);
 
         // This will make sure looped animations don't get in the way (experimental)
         this.priorityAnimation = false;
@@ -144,7 +144,7 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled) {
         // Jumping
         if (this.body.velocity.y != 0) {
 
-            if (this.body.velocity.y > 0) {
+            if (this.body.velocity.y < 0) {
                 this.animations.play('jump');
             } else {
                 this.animations.play('fall');

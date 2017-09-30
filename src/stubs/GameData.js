@@ -14,7 +14,7 @@ const gameData = {
     creatures: [
         {
             id: 'bug',
-            sprite: 'player',
+            sprite: 'enemy',
             body: {
                 x: 48,
                 y: 48,
@@ -35,7 +35,7 @@ const gameData = {
             config: {
                 value: {
                     movementSpeed: 200,
-                    alertRange: 300,
+                    alertRange: 400,
                     attackRange: 60
                 }
             }

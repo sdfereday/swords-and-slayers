@@ -153,6 +153,8 @@ class Enemy extends Phaser.Sprite {
         if (this.disabled || this.busy)
             return;
 
+        this.faceTarget(this.currentTarget);
+
         this.busy = true;
         this.priorityAnimation = true;
 
@@ -180,7 +182,7 @@ class Enemy extends Phaser.Sprite {
 
     move(dir) {
 
-        if (Helpers.distance(this, this.currentTarget) < this.width / 3 || this.disabled)
+        if (Helpers.distance(this, this.currentTarget) < this.width / 3 || this.disabled || this.targetWithinBounds())
             return;
 
         this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
@@ -202,6 +204,22 @@ class Enemy extends Phaser.Sprite {
 
         this.scale.setTo(dir, 1);
         this.activeWeapon.scale.setTo(dir, 1);
+
+    }
+
+    faceTarget(pos) {
+
+        let dir = this.getTargetDirection(pos.x);
+
+        this.scale.setTo(dir, 1);
+        this.activeWeapon.scale.setTo(dir, 1);
+
+    }
+
+    targetWithinBounds() {
+
+        // Checks if the current target is within a good enough 'x' zone to prevent left-right shift (might need 'y' in future)
+        return this.currentTarget && (this.currentTarget.x > this.x - (this.width / 3) && this.currentTarget.x < this.x + (this.width / 3));
 
     }
 
