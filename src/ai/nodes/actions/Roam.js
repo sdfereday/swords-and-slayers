@@ -40,12 +40,10 @@ class Roam extends b3.Action {
         tick.target.moveTo(this.destination);
 
         if (Helpers.distance({ x: tick.target.x, y: tick.target.y }, this.destination) < 30) {
-            tick.target.stop();
+            tick.target.resetMovement();
             console.log("Destination reached.");
             return b3.SUCCESS;
         }
-
-        console.log("Roaming...");
 
         return b3.RUNNING;
 

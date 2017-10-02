@@ -1,66 +1,40 @@
 import mix from '../helpers/Mix';
 import Helpers from '../helpers/Helpers';
+import BaseEntity from '../entities/BaseEntity';
 import UserControlled from '../components/UserControlled';
 import Weapon from '../entities/Weapon';
-
-// Effects
-import Animator from '../animation/Animator';
 import HitEffects from '../components/HitEffects';
 
-class Hero extends mix(Phaser.Sprite).with(UserControlled, HitEffects) {
+class Hero extends mix(BaseEntity).with(UserControlled, HitEffects) {
 
-    constructor(game, x, y, name, data, animationsData) {
+    constructor(game, x, y, name, data) {
 
-        // Phaser requires all of these to happen
-        super(game, x, y, name);
+        super(game, x, y, name, data);
 
-        game.add.existing(this);
-        game.physics.arcade.enable(this);
-
-        // Custom data to expect for this entity
-        this.config = {};
-        this.stats = {};
-        this.equipment = {};
-        this.activeWeapon = {};
-
-        // Define properties with supplied data (TODO: Revise method)
-        if (data) {
-            Object.defineProperties(this, data);
-        }
-
-        // Make player collide with world boundaries so he doesn't leave the stage
         this.body.collideWorldBounds = true;
-
-        // Flags
-        this.busy = false;
-        this.disabled = false;
-        this.jumping = false;
-
-        // Set the anchor
-        this.anchor.x = 0.5;
-
-        // Animations setup
-        this.animator = new Animator(this.animations);
 
     }
 
     update() {
 
-        if (this.disabled)
-            return;
-
         this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
+        if (this.disabled && !this.body.touching.down)
+            return;
+
+        if (this.disabled && this.body.touching.down) {
+            this.resetMovement();
+            return;
+        }
+
+        this.resetMovement();
+
         if (this.leftInputIsActive()) {
-            this.body.velocity.x = -this.config.movementSpeed;
-            this.scale.setTo(-1, 1);
-            this.activeWeapon.scale.setTo(-1, 1);
+            this.body.velocity.x += -this.config.movementSpeed;
+            this.correctScale(-1);
         } else if (this.rightInputIsActive()) {
-            this.body.velocity.x = this.config.movementSpeed;
-            this.scale.setTo(1, 1);
-            this.activeWeapon.scale.setTo(1, 1);
-        } else {
-            this.body.velocity.x = 0;
+            this.body.velocity.x += this.config.movementSpeed;
+            this.correctScale(1);
         }
 
         // If the player is touching the ground, let him have 2 jumps
@@ -81,30 +55,7 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled, HitEffects) {
             this.jumping = false;
         }
 
-        // Play entity anims
         this.animate();
-
-    }
-
-    // TODO: All below can be moved in to components
-    /// Data setup and init ///
-    setWeapon(weaponData) {
-
-        // Need to revise how to do this
-        this.activeWeapon = new Weapon(this.game, 0, 0, 'weapon-gfx');
-        this.activeWeapon.y += this.activeWeapon.height;
-
-        // This is only temporary
-        this.activeWeapon.body.setSize(48, 64, 32, 32);
-
-        return this;
-
-    }
-
-    setBody(bodyData) {
-
-        this.body.setSize(bodyData.x, bodyData.y, bodyData.w, bodyData.h);
-        return this;
 
     }
 
@@ -128,6 +79,8 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled, HitEffects) {
         console.log(this.name + " is taking damage: " + n);
         console.log(origin, "was origin of damage.");
 
+        this.activeWeapon.disable();
+
         // Some cheeky knockback
         this.body.velocity.x = Helpers.getTargetDirection(origin.x, this.x) * -300;
         this.body.velocity.y = -300;
@@ -137,13 +90,6 @@ class Hero extends mix(Phaser.Sprite).with(UserControlled, HitEffects) {
     }
 
     /// Animations ///
-    registerAnimations(data) {
-
-        this.animator.registerMany(data);
-        return this;
-
-    }
-
     animate() {
 
         // Jumping

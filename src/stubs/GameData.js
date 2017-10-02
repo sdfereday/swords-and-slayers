@@ -73,6 +73,12 @@ let gameData = {
                     dmg: 1,
                     animTime: 1000
                 }
+            },
+            body: {
+                x: 48,
+                y: 64,
+                w: 32,
+                h: 32
             }
         }
     ],
@@ -99,6 +105,7 @@ let gameData = {
             },
             config: {
                 value: {
+                    behaviourId: 'testai',
                     movementSpeed: 200,
                     alertRange: 400,
                     attackRange: 60

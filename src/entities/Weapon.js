@@ -7,7 +7,6 @@ class Weapon extends Phaser.Sprite {
         game.add.existing(this);
         game.physics.arcade.enable(this);
 
-        this.id = "???";
         this.name = name;
         this.body.allowGravity = false;
         this.body.enable = false;
@@ -21,10 +20,6 @@ class Weapon extends Phaser.Sprite {
         // Set the anchor
         this.anchor.x = 0.5;
 
-    }
-
-    damageOutput() {
-        return this.stats.damageOutput;
     }
 
     use(time, onComplete) {
@@ -41,14 +36,32 @@ class Weapon extends Phaser.Sprite {
         this.game.time.events.add(time, () => {
             this.body.enable = false;
             //this.alpha = 0;
-            if(typeof onComplete === 'function')
+            if (typeof onComplete === 'function')
                 onComplete.call(this);
         }, this);
 
     }
 
+    disable() {
+
+        this.body.enable = false;
+
+    }
+
+    damageOutput() {
+
+        return this.stats.damageOutput;
+
+    }
+
+    setBody(d) {
+
+        this.body.setSize(d.x, d.y, d.w, d.h);
+
+    }
+
     anchorTo(x, y) {
-        
+
         this.x = x;
         this.y = y;
 

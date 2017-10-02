@@ -8,7 +8,7 @@ let b3Mod = path.join(__dirname, '/node_modules/behavior3js/');
 
 module.exports = {
     entry: {
-        dist: path.resolve(__dirname, './src/app.js'),
+        dist: path.resolve(__dirname, './src/game.js'),
         vendor: ['pixi', 'p2', 'phaser', 'b3']
     },
     output: {

@@ -34,6 +34,13 @@ class Helpers {
 
     }
 
+    static targetWithinBounds(target, owner, range) {
+
+        // Checks if the current target is within a good enough 'x' zone to prevent left-right shift (might need 'y' in future)
+        return target && (target.x > owner.x - range && target.x < owner.x + range);
+
+    }
+
 }
 
 export default Helpers;

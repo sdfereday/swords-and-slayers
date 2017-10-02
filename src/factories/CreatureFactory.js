@@ -12,10 +12,11 @@ class CreatureFactory {
                 equipment: creatureData.equipment
             });
 
-        creature.registerAnimations(creatureData.animations)
-            .setWeapon(GameData.weapons.find(x => x.id === creatureData.equipment.value.primaryWeapon))
-            .setBody(creatureData.body)
-            .initializeAI();
+        creature.attachWeapon(GameData.weapons.find(x => x.id === creatureData.equipment.value.primaryWeapon));
+        creature.setBody(creatureData.body);
+
+        if (creatureData.animations && creature.animator)
+            creature.animator.registerMany(creatureData.animations)
 
         return creature;
 
