@@ -36,11 +36,18 @@ class GameState {
         this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
         this.game.load.image('col-atlas', 'resources/Tiles/col.png');
+        
+        //...
+        this.game.load.image('slope-atlas', 'resources/Tiles/arcade-slopes-64.png');
 
     }
 
     create() {
 
+        // Load plugins
+        this.game.plugins.add(Phaser.Plugin.ArcadeSlopes);
+
+        // Startup physics
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.gravity.y = 2500; // pixels/second/second
         this.game.physics.arcade.TILE_BIAS = 40; // Prevents strange tile fall-through
@@ -87,18 +94,29 @@ class GameState {
 
         // TODO: Consider making the manifests available globally (no point making it complicated)
         let enemies = mapData.enemies.map(function (d) {
-            return CreatureFactory.make(d.id, d.pos, this.game);
+            //return CreatureFactory.make(d.id, d.pos, this.game);
         }, this);
 
-        enemies.forEach((creatureSprite) => {
-            creatureSprite.setTarget(this.hero);
-            this.enemies.add(creatureSprite);
-            if (creatureSprite.activeWeapon)
-                this.enemyWeapons.add(creatureSprite.activeWeapon);
-        });
+        // enemies.forEach((creatureSprite) => {
+        //     creatureSprite.setTarget(this.hero);
+        //     this.enemies.add(creatureSprite);
+        //     if (creatureSprite.activeWeapon)
+        //         this.enemyWeapons.add(creatureSprite.activeWeapon);
+        // });
 
         // Finally, enable camera
         this.game.camera.follow(this.hero, Phaser.Camera.FOLLOW_TOPDOWN);
+
+        /////
+        //https://github.com/hexus/phaser-arcade-slopes
+        // Experimental (slopes)
+        let map = world.gameTileMap;
+
+        map.addTilesetImage('arcade-slopes-64', 'slope-atlas');
+        this.game.slopes.convertTilemapLayer(this.collisionLayer, 'arcadeslopes', 14);
+        this.game.slopes.enable(this.hero);
+
+        this.collisionLayer.debug = true;
 
     }
 

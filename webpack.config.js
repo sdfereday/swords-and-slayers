@@ -69,14 +69,14 @@ module.exports = {
         new webpack.ProvidePlugin({
             // It seems to fix the null ref issue, thought it's not reccommended (will look in to a better solution)
             b3: 'b3'
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            drop_console: false,
-            minimize: true,
-            output: {
-                comments: false
-            }
-        })
+        })//,
+        // new webpack.optimize.UglifyJsPlugin({
+        //     drop_console: false,
+        //     minimize: true,
+        //     output: {
+        //         comments: false
+        //     }
+        // })
     ],
     watch: true
 };
