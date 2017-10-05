@@ -2,11 +2,10 @@ import mix from '../helpers/Mix';
 import Helpers from '../helpers/Helpers';
 import BaseEntity from '../entities/BaseEntity';
 import Behaviours from '../ai/Behaviours';
-
-// Effects
+import AttachedWeapon from '../components/AttachedWeapon';
 import HitEffects from '../components/HitEffects';
 
-class Enemy extends mix(BaseEntity).with(HitEffects) {
+class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
 
     constructor(game, x, y, name, data) {
 
@@ -21,11 +20,12 @@ class Enemy extends mix(BaseEntity).with(HitEffects) {
 
         this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
-        if (this.disabled && !this.body.touching.down)
+        if (this.disabled && !this.body.onFloor())
             return;
 
-        if (this.disabled && this.body.touching.down) {
-            this.resetMovement();
+        if (this.disabled && this.body.onFloor()) {
+            // Doesn't quite work
+            // this.resetMovement();
             return;
         }
 

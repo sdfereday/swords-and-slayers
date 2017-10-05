@@ -10,7 +10,7 @@ class Weapon extends Phaser.Sprite {
         this.name = name;
         this.body.allowGravity = false;
         this.body.enable = false;
-        this.alpha = 0;
+        this.alpha = 0.3;
 
         // You can override this
         this.stats = {

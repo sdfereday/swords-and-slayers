@@ -1,17 +1,24 @@
 import mix from '../helpers/Mix';
 import Helpers from '../helpers/Helpers';
 import BaseEntity from '../entities/BaseEntity';
-import UserControlled from '../components/UserControlled';
-import Weapon from '../entities/Weapon';
+import InputManager from '../components/InputManager';
+import AttachedWeapon from '../components/AttachedWeapon';
 import HitEffects from '../components/HitEffects';
 
-class Hero extends mix(BaseEntity).with(UserControlled, HitEffects) {
+class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon) {
 
     constructor(game, x, y, name, data) {
 
         super(game, x, y, name, data);
 
         this.body.collideWorldBounds = true;
+        this.itype = '';
+
+        this.jumps = 2;
+        this.jumping = false;
+        this.onFloor = false;
+
+        this.initManualInput();
 
     }
 
@@ -19,13 +26,22 @@ class Hero extends mix(BaseEntity).with(UserControlled, HitEffects) {
 
         this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
-        if (this.disabled && !this.body.touching.down)
+        if (this.disabled && !this.body.onFloor())
             return;
 
-        if (this.disabled && this.body.touching.down) {
-            this.resetMovement();
+        if (this.disabled && this.body.onFloor()) {
+            // Doesn't quite work
+            // this.resetMovement();
             return;
         }
+
+        this.inputUpdate();
+        this.animate();
+
+    }
+
+    /// Manual Input ///
+    inputUpdate(inputType) {
 
         this.resetMovement();
 
@@ -37,8 +53,7 @@ class Hero extends mix(BaseEntity).with(UserControlled, HitEffects) {
             this.correctScale(1);
         }
 
-        // If the player is touching the ground, let him have 2 jumps
-        if (this.body.touching.down) {
+        if (this.body.onFloor()) {
             this.jumps = 2;
             this.jumping = false;
         }
@@ -54,8 +69,6 @@ class Hero extends mix(BaseEntity).with(UserControlled, HitEffects) {
             this.jumps--;
             this.jumping = false;
         }
-
-        this.animate();
 
     }
 

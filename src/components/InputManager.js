@@ -1,6 +1,24 @@
-let UserControlled = (superclass) => class extends superclass {
+let InputManager = (superclass) => class extends superclass {
 
-    //// TODO: Move this lot out of here and in to global. It'll be easier to configure from there.
+    initManualInput() {
+
+        // Capture certain keys to prevent their default actions in the browser.
+        // This is only necessary because this is an HTML5 game. Games on other
+        // platforms may not need code like this.
+        this.game.input.keyboard.addKeyCapture([
+            Phaser.Keyboard.LEFT,
+            Phaser.Keyboard.RIGHT,
+            Phaser.Keyboard.UP,
+            Phaser.Keyboard.DOWN
+        ]);
+
+        this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
+
+        // Based on an assumption (not great but I know it's there)
+        this.attackKey.onDown.add(this.attack, this);
+
+    }
+
     // This function should return true when the player activates the "go left" control
     // In this case, either holding the right arrow or tapping or clicking on the left
     // side of the screen.
@@ -53,4 +71,4 @@ let UserControlled = (superclass) => class extends superclass {
 
 };
 
-export default UserControlled;
+export default InputManager;

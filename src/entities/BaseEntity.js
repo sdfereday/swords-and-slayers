@@ -1,5 +1,4 @@
 import Helpers from '../helpers/Helpers';
-import Weapon from '../entities/Weapon';
 import Animator from '../animation/Animator';
 
 class BaseEntity extends Phaser.Sprite {
@@ -10,7 +9,7 @@ class BaseEntity extends Phaser.Sprite {
         super(game, x, y, name);
 
         game.add.existing(this);
-        game.physics.arcade.enable(this);
+        game.physics.enable(this, Phaser.Physics.ARCADE);
 
         // Custom data to expect for this entity
         this.config = {};
@@ -26,7 +25,6 @@ class BaseEntity extends Phaser.Sprite {
         // Flags
         this.busy = false;
         this.disabled = false;
-        this.jumping = false;
 
         // Set the anchor
         this.anchor.x = 0.5;
@@ -60,28 +58,7 @@ class BaseEntity extends Phaser.Sprite {
 
     faceTarget(pos) {
 
-        let dir = Helpers.getTargetDirection(pos.x, this.x);
-
-        this.scale.setTo(dir, 1);
-
-        if (this.activeWeapon)
-            this.activeWeapon.scale.setTo(dir, 1);
-
-    }
-
-    attachWeapon(weaponData, pos) {
-
-        this.activeWeapon = new Weapon(this.game, 0, 0, weaponData.sprite);
-        this.activeWeapon.y += this.activeWeapon.height;
-
-        if (pos) {
-            this.activeWeapon.x = pos.x;
-            this.activeWeapon.y = pos.y;
-        }
-
-        this.activeWeapon.setBody(weaponData);
-
-        return this;
+        this.correctScale(Helpers.getTargetDirection(pos.x, this.x));
 
     }
 

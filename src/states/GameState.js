@@ -13,12 +13,15 @@ class GameState {
 
     render() {
 
-        // game.debug.bodyInfo(this.hero.activeWeapon, 32, 32);
-        // game.debug.body(this.hero.activeWeapon);
+        //this.game.debug.bodyInfo(this.hero, 32, 32);
+        //this.game.debug.body(this.hero);
+
+        // this.game.debug.bodyInfo(this.hero.activeWeapon, 32, 32);
+        // this.game.debug.body(this.hero.activeWeapon);
 
         // this.enemies.children.forEach((e) => {
-        //     game.debug.bodyInfo(e, 32, 32);
-        //     game.debug.body(e.activeWeapon);
+        //     this.game.debug.bodyInfo(e.activeWeapon, 32, 32);
+        //     this.game.debug.body(e.activeWeapon);
         // });
 
     }
@@ -29,33 +32,44 @@ class GameState {
         this.game.load.spritesheet('enemy', 'resources/Game/enemy.png', 128, 128, 20);
         this.game.load.image('ground', 'resources/Game/platform tile2.png', 32, 32);
 
+        // https://phaser.io/examples/v2/loader/load-tilemap-json
+        this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, Phaser.Tilemap.TILED_JSON);
+        this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
+        this.game.load.image('col-atlas', 'resources/Tiles/col.png');
+
     }
 
     create() {
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.game.physics.arcade.gravity.y = 2000; // pixels/second/second
+        this.game.physics.arcade.gravity.y = 2500; // pixels/second/second
+        this.game.physics.arcade.TILE_BIAS = 40; // Prevents strange tile fall-through
 
         this.game.stage.backgroundColor = '#2d2d2d';
 
-        // Capture certain keys to prevent their default actions in the browser.
-        // This is only necessary because this is an HTML5 game. Games on other
-        // platforms may not need code like this.
-        this.game.input.keyboard.addKeyCapture([
-            Phaser.Keyboard.LEFT,
-            Phaser.Keyboard.RIGHT,
-            Phaser.Keyboard.UP,
-            Phaser.Keyboard.DOWN
-        ]);
-
-        this.attackKey = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
-
         // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
         let mapData = DSMapData.find(x => x.id === 'testlevel');
-        this.ground = new WorldBuilder(this.game).makeTest();
+        let world = new WorldBuilder(this.game, {
+            tilemap: 'level-tilemap',
+            layers: [
+                {
+                    name: 'world-sheet',
+                    cacheName: 'world-atlas',
+                    worldSizeLayer: true
+                },
+                {
+                    name: 'collidable',
+                    cacheName: 'col-atlas',
+                    collisionLayer: true
+                }
+            ]
+        });
+
+        // Should only be one needed per level so this is ok
+        this.collisionLayer = world.getCollisionLayer();
 
         // Make entities
-        this.hero = new Hero(this.game, 700, 100, DSGameData.player.sprite, {
+        this.hero = new Hero(this.game, 250, 700, DSGameData.player.sprite, {
             config: DSGameData.player.config,
             stats: DSGameData.player.stats,
             equipment: DSGameData.player.equipment
@@ -66,11 +80,6 @@ class GameState {
 
         if (DSGameData.player.animations && this.hero.animator)
             this.hero.animator.registerMany(DSGameData.player.animations);
-
-        // Bind some keys
-        this.attackKey.onDown.add(function () {
-            this.hero.attack();
-        }, this);
 
         // Make enemies and things
         this.enemies = this.game.add.group();
@@ -88,12 +97,15 @@ class GameState {
                 this.enemyWeapons.add(creatureSprite.activeWeapon);
         });
 
+        // Finally, enable camera
+        this.game.camera.follow(this.hero, Phaser.Camera.FOLLOW_TOPDOWN);
+
     }
 
     update() {
 
-        this.game.physics.arcade.collide(this.hero, this.ground);
-        this.game.physics.arcade.collide(this.enemies, this.ground);
+        this.game.physics.arcade.collide(this.hero, this.collisionLayer);
+        this.game.physics.arcade.collide(this.enemies, this.collisionLayer);
 
         this.game.physics.arcade.overlap(this.hero.activeWeapon, this.enemies, function (weapon, npc) {
             npc.takeDamage(weapon.damageOutput(), {
