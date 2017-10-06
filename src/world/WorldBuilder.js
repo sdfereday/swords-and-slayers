@@ -17,6 +17,8 @@ class WorldBuilder {
         //  The second parameter maps this name to the Phaser.Cache key 'tiles'
         for (let i = 0; i < data.layers.length; i++) {
 
+            // Not sure you need to add this for each layer... todo double check (it's important for performance).
+            // Obviously if there's a different one for each layer, then this is fine.
             let layer = data.layers[i];
             this.gameTileMap.addTilesetImage(layer.name, layer.cacheName);
 
@@ -62,6 +64,16 @@ class WorldBuilder {
 
     }
 
+    postProcess() {
+
+        //  Increase z index of layer if flagged as a foreground (doesn't care how many there are)
+        for(let i = 0; i < this.layers.length; i++) {
+            if(this.layers[i].layerData.foregroundLayer)
+                this.layers[i].phaserLayer.bringToTop();
+        }
+
+    }
+
     getLayerByProperty(prop) {
 
         return this.layers.find(x => x.layerData[prop]);
@@ -88,6 +100,18 @@ class WorldBuilder {
         ent.body.slopes.pullDown = pulldownValue;
         ent.body.slopes.pullBottomLeft = pulldownValue;
         ent.body.slopes.pullBottomRight = pulldownValue;
+        ent.body.slopes.pullTopLeft = pulldownValue;
+        ent.body.slopes.pullTopRight = pulldownValue;
+
+        // In case you need them
+        // ent.body.slopes.pullUp = pulldownValue;
+        // ent.body.slopes.pullDown = pulldownValue;
+        // ent.body.slopes.pullLeft = pulldownValue;
+        // ent.body.slopes.pullRight = pulldownValue;
+        // ent.body.slopes.pullTopLeft = pulldownValue;
+        // ent.body.slopes.pullTopRight = pulldownValue;
+        // ent.body.slopes.pullBottomLeft = pulldownValue;
+        // ent.body.slopes.pullBottomRight = pulldownValue;
 
     }
 

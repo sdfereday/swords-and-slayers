@@ -93,6 +93,10 @@ class GameState {
                 this.enemyWeapons.add(creatureSprite.activeWeapon);
         });
 
+        // Post process anything else that needs doing to the world before game starts (layer sorting, lights, etc),
+        // note that this needs to happen 'after' entities are placed so z-indexing works.
+        world.postProcess();
+
         // Finally, enable camera
         this.game.camera.follow(this.hero, Phaser.Camera.FOLLOW_TOPDOWN);
 

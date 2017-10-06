@@ -13,6 +13,11 @@ const MapData = [
                     name: 'colliders',
                     cacheName: 'col-atlas',
                     collisionLayer: true
+                },
+                {
+                    name: 'foreground',
+                    cacheName: 'world-atlas',
+                    foregroundLayer: true
                 }
             ]
         },
