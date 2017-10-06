@@ -16,7 +16,6 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
 
         this.jumps = 2;
         this.jumping = false;
-        this.onFloor = false;
 
         this.initManualInput();
 
@@ -26,12 +25,11 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
 
         this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
-        if (this.disabled && !this.body.onFloor())
+        if (this.disabled && !this.body.touching.down)
             return;
 
-        if (this.disabled && this.body.onFloor()) {
-            // Doesn't quite work
-            // this.resetMovement();
+        if (this.disabled && this.justGotHit && this.body.touching.down) {
+            this.justGotHit = false;
             return;
         }
 
@@ -53,7 +51,7 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
             this.correctScale(1);
         }
 
-        if (this.body.onFloor()) {
+        if (this.body.touching.down) {
             this.jumps = 2;
             this.jumping = false;
         }
@@ -89,6 +87,8 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
         if (this.disabled)
             return;
 
+        this.justGotHit = false;
+
         console.log(this.name + " is taking damage: " + n);
         console.log(origin, "was origin of damage.");
 
@@ -106,7 +106,7 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
     animate() {
 
         // Jumping
-        if (this.body.velocity.y !== 0) {
+        if (!this.body.touching.down) {
 
             if (this.body.velocity.y < 0) {
                 this.animator.play('jump');

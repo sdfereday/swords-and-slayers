@@ -25,6 +25,7 @@ class BaseEntity extends Phaser.Sprite {
         // Flags
         this.busy = false;
         this.disabled = false;
+        this.justGotHit = false;
 
         // Set the anchor
         this.anchor.x = 0.5;

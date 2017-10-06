@@ -313,6 +313,7 @@ var BaseEntity = function (_Phaser$Sprite) {
                 // Flags
                 _this.busy = false;
                 _this.disabled = false;
+                _this.justGotHit = false;
 
                 // Set the anchor
                 _this.anchor.x = 0.5;
@@ -707,14 +708,12 @@ var GameState = function () {
                         // https://phaser.io/examples/v2/loader/load-tilemap-json
                         this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, _phaser2.default.Tilemap.TILED_JSON);
                         this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
-                        this.game.load.image('col-atlas', 'resources/Tiles/col.png');
-
-                        //...
-                        this.game.load.image('slope-atlas', 'resources/Tiles/arcade-slopes-64.png');
+                        this.game.load.image('col-atlas', 'resources/Tiles/arcade-slopes-64.png');
                 }
         }, {
                 key: 'create',
                 value: function create() {
+                        var _this = this;
 
                         // Load plugins
                         this.game.plugins.add(_phaser2.default.Plugin.ArcadeSlopes);
@@ -730,21 +729,11 @@ var GameState = function () {
                         var mapData = _MapData2.default.find(function (x) {
                                 return x.id === 'testlevel';
                         });
-                        var world = new _WorldBuilder2.default(this.game, {
-                                tilemap: 'level-tilemap',
-                                layers: [{
-                                        name: 'world-sheet',
-                                        cacheName: 'world-atlas',
-                                        worldSizeLayer: true
-                                }, {
-                                        name: 'collidable',
-                                        cacheName: 'col-atlas',
-                                        collisionLayer: true
-                                }]
-                        });
+                        var world = new _WorldBuilder2.default(this.game);
+                        world.initializeWorld(mapData.world);
 
                         // Should only be one needed per level so this is ok
-                        this.collisionLayer = world.getCollisionLayer();
+                        this.collisionLayer = world.getLayerByProperty('collisionLayer');
 
                         // Make entities
                         this.hero = new _Hero2.default(this.game, 250, 700, _GameData2.default.player.sprite, {
@@ -758,6 +747,9 @@ var GameState = function () {
                         }));
                         this.hero.setBody(_GameData2.default.player.body);
 
+                        // You must call this after any body size modifications have been made
+                        world.enableSlopesFor(this.hero);
+
                         if (_GameData2.default.player.animations && this.hero.animator) this.hero.animator.registerMany(_GameData2.default.player.animations);
 
                         // Make enemies and things
@@ -766,36 +758,25 @@ var GameState = function () {
 
                         // TODO: Consider making the manifests available globally (no point making it complicated)
                         var enemies = mapData.enemies.map(function (d) {
-                                //return CreatureFactory.make(d.id, d.pos, this.game);
+                                return _CreatureFactory2.default.make(d.id, d.pos, this.game);
                         }, this);
 
-                        // enemies.forEach((creatureSprite) => {
-                        //     creatureSprite.setTarget(this.hero);
-                        //     this.enemies.add(creatureSprite);
-                        //     if (creatureSprite.activeWeapon)
-                        //         this.enemyWeapons.add(creatureSprite.activeWeapon);
-                        // });
+                        enemies.forEach(function (creatureSprite) {
+                                world.enableSlopesFor(creatureSprite);
+                                creatureSprite.setTarget(_this.hero);
+                                _this.enemies.add(creatureSprite);
+                                if (creatureSprite.activeWeapon) _this.enemyWeapons.add(creatureSprite.activeWeapon);
+                        });
 
                         // Finally, enable camera
                         this.game.camera.follow(this.hero, _phaser2.default.Camera.FOLLOW_TOPDOWN);
-
-                        /////
-                        //https://github.com/hexus/phaser-arcade-slopes
-                        // Experimental (slopes)
-                        var map = world.gameTileMap;
-
-                        map.addTilesetImage('arcade-slopes-64', 'slope-atlas');
-                        this.game.slopes.convertTilemapLayer(this.collisionLayer, 'arcadeslopes', 14);
-                        this.game.slopes.enable(this.hero);
-
-                        this.collisionLayer.debug = true;
                 }
         }, {
                 key: 'update',
                 value: function update() {
 
-                        this.game.physics.arcade.collide(this.hero, this.collisionLayer);
-                        this.game.physics.arcade.collide(this.enemies, this.collisionLayer);
+                        this.game.physics.arcade.collide(this.hero, this.collisionLayer.phaserLayer);
+                        this.game.physics.arcade.collide(this.enemies, this.collisionLayer.phaserLayer);
 
                         this.game.physics.arcade.overlap(this.hero.activeWeapon, this.enemies, function (weapon, npc) {
                                 npc.takeDamage(weapon.damageOutput(), {
@@ -830,6 +811,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 var MapData = [{
     id: "testlevel",
+    world: {
+        tilemap: 'level-tilemap',
+        layers: [{
+            name: 'world-sheet',
+            cacheName: 'world-atlas',
+            worldSizeLayer: true
+        }, {
+            name: 'colliders',
+            cacheName: 'col-atlas',
+            collisionLayer: true
+        }]
+    },
     enemies: [{
         id: 'bug',
         pos: {
@@ -849,7 +842,7 @@ exports.default = MapData;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+        value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -857,67 +850,100 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var WorldBuilder = function () {
-    function WorldBuilder(game, data) {
-        _classCallCheck(this, WorldBuilder);
+        function WorldBuilder(game) {
+                _classCallCheck(this, WorldBuilder);
 
-        this.game = game;
-        this.layers = [];
-
-        //  The 'name' key here is the Loader key given in game.load.tilemap
-        this.gameTileMap = this.game.add.tilemap(data.tilemap);
-
-        //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
-        //  The second parameter maps this name to the Phaser.Cache key 'tiles'
-        for (var i = 0; i < data.layers.length; i++) {
-
-            var layer = data.layers[i];
-            this.gameTileMap.addTilesetImage(layer.name, layer.cacheName);
-
-            //  Creates a layer from the World1 layer in the map data.
-            //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
-            //  If naming from data, make sure it's the right name (see level json).
-            this.layers.push({
-                layerData: layer,
-                phaserLayer: this.gameTileMap.createLayer(i)
-            });
+                this.game = game;
+                this.layers = [];
+                this.gameTileMap = {};
         }
 
-        // Sanity checks
-        if (this.layers.length === 0) throw new Error("You must have some layers defined.");
+        _createClass(WorldBuilder, [{
+                key: 'initializeWorld',
+                value: function initializeWorld(data) {
 
-        // https://phaser.io/docs/2.4.4/Phaser.Tilemap.html#setCollision
-        // Mapping the index would be just a matter of checking a property in 'tiled' for example (0 is floor tile in this instance)
-        var collision = this.getCollisionLayer();
-        if (collision) {
-            this.gameTileMap.setCollisionByExclusion([0], true, collision);
-        }
+                        //  The 'name' key here is the Loader key given in game.load.tilemap
+                        this.gameTileMap = this.game.add.tilemap(data.tilemap);
 
-        //  This resizes the game world to match the layer dimensions
-        var worldSizeLayer = this.getWorldSizeLayer();
-        if (worldSizeLayer) {
-            worldSizeLayer.resizeWorld();
-        }
-    }
+                        //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
+                        //  The second parameter maps this name to the Phaser.Cache key 'tiles'
+                        for (var i = 0; i < data.layers.length; i++) {
 
-    _createClass(WorldBuilder, [{
-        key: "getCollisionLayer",
-        value: function getCollisionLayer() {
+                                var layer = data.layers[i];
+                                this.gameTileMap.addTilesetImage(layer.name, layer.cacheName);
 
-            return this.layers.find(function (x) {
-                return x.layerData.collisionLayer;
-            }).phaserLayer;
-        }
-    }, {
-        key: "getWorldSizeLayer",
-        value: function getWorldSizeLayer() {
+                                //  Creates a layer from the World1 layer in the map data.
+                                //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
+                                //  If naming from data, make sure it's the right name (see level json).
+                                this.layers.push({
+                                        layerData: layer,
+                                        phaserLayer: this.gameTileMap.createLayer(i)
+                                });
+                        }
 
-            return this.layers.find(function (x) {
-                return x.layerData.worldSizeLayer;
-            }).phaserLayer;
-        }
-    }]);
+                        // Sanity checks
+                        if (this.layers.length === 0) throw new Error("You must have some layers defined.");
 
-    return WorldBuilder;
+                        //https://github.com/hexus/phaser-arcade-slopes
+                        // https://phaser.io/docs/2.4.4/Phaser.Tilemap.html#setCollision
+                        // Mapping the index would be just a matter of checking a property in 'tiled' for example (0 is floor tile in this instance)
+                        var collision = this.getLayerByProperty('collisionLayer');
+                        if (collision) {
+
+                                this.gameTileMap.setCollisionByExclusion([0], true, collision.phaserLayer);
+
+                                if (this.game.slopes) this.game.slopes.convertTilemapLayer(collision.phaserLayer, 'arcadeslopes', this.getTilesetByName(collision.layerData.name).firstgid);
+                        }
+
+                        //  This resizes the game world to match the layer dimensions
+                        var worldSizeLayer = this.getLayerByProperty('worldSizeLayer');
+                        if (worldSizeLayer) {
+                                worldSizeLayer.phaserLayer.resizeWorld();
+                        }
+
+                        // We're assuming this is a platform game right now (see site for more info)
+                        // Prefer the minimum Y offset globally (also see 'enableSlopesFor')
+                        this.game.slopes.preferY = true;
+
+                        // Debugs the phaser layer (in case you didn't notice)
+                        collision.phaserLayer.debug = true;
+                }
+        }, {
+                key: 'getLayerByProperty',
+                value: function getLayerByProperty(prop) {
+
+                        return this.layers.find(function (x) {
+                                return x.layerData[prop];
+                        });
+                }
+        }, {
+                key: 'getTilesetByName',
+                value: function getTilesetByName(name) {
+
+                        return this.gameTileMap.tilesets.find(function (x) {
+                                return x.name === name;
+                        });
+                }
+        }, {
+                key: 'enableSlopesFor',
+                value: function enableSlopesFor(ent) {
+
+                        this.game.slopes.enable(ent);
+
+                        // Prefer the minimum Y offset for this physics body,
+                        // it's turned way up to avoid animation glitch when leaving
+                        // flat to slope (experiment with it)
+                        var pulldownValue = 1250;
+
+                        // Apply these to prevent sliding and 'over zelousness' on y axis
+                        ent.body.slopes.preferY = true;
+                        ent.body.slopes.pullDown = pulldownValue;
+                        ent.body.slopes.pullBottomLeft = pulldownValue;
+                        ent.body.slopes.pullBottomRight = pulldownValue;
+                }
+        }]);
+
+        return WorldBuilder;
 }();
 
 exports.default = WorldBuilder;
@@ -1045,11 +1071,10 @@ var Enemy = function (_mix$with) {
 
             this.activeWeapon.anchorTo(this.x, this.y + this.activeWeapon.height);
 
-            if (this.disabled && !this.body.onFloor()) return;
+            if (this.disabled && !this.body.touching.down) return;
 
-            if (this.disabled && this.body.onFloor()) {
-                // Doesn't quite work
-                // this.resetMovement();
+            if (this.disabled && this.justGotHit && this.body.touching.down) {
+                this.justGotHit = false;
                 return;
             }
 
@@ -1116,7 +1141,6 @@ var Enemy = function (_mix$with) {
             this.faceTarget(this.currentTarget);
 
             this.busy = true;
-            this.priorityAnimation = true;
 
             // TODO: Remove magic numbers
             var currentAnim = this.animator.getAnimation('attack'),
@@ -1145,6 +1169,8 @@ var Enemy = function (_mix$with) {
 
             if (this.disabled) return;
 
+            this.justGotHit = true;
+
             console.log(this.name + " is taking damage: " + n);
             console.log(origin, "was origin of damage.");
 
@@ -1152,8 +1178,8 @@ var Enemy = function (_mix$with) {
             this.activeWeapon.disable();
 
             // Some cheeky knockback
-            this.body.velocity.x = _Helpers2.default.getTargetDirection(this.currentTarget.x, this.x) * -300;
-            this.body.velocity.y = -300;
+            this.body.velocity.x = _Helpers2.default.getTargetDirection(this.currentTarget.x, this.x) * -500;
+            this.body.velocity.y = -500;
 
             this.damageFlash();
         }
@@ -2140,7 +2166,6 @@ var Hero = function (_mix$with) {
 
         _this.jumps = 2;
         _this.jumping = false;
-        _this.onFloor = false;
 
         _this.initManualInput();
 
@@ -2153,11 +2178,10 @@ var Hero = function (_mix$with) {
 
             this.activeWeapon.anchorTo(this.x, this.y + this.activeWeapon.height);
 
-            if (this.disabled && !this.body.onFloor()) return;
+            if (this.disabled && !this.body.touching.down) return;
 
-            if (this.disabled && this.body.onFloor()) {
-                // Doesn't quite work
-                // this.resetMovement();
+            if (this.disabled && this.justGotHit && this.body.touching.down) {
+                this.justGotHit = false;
                 return;
             }
 
@@ -2181,7 +2205,7 @@ var Hero = function (_mix$with) {
                 this.correctScale(1);
             }
 
-            if (this.body.onFloor()) {
+            if (this.body.touching.down) {
                 this.jumps = 2;
                 this.jumping = false;
             }
@@ -2219,6 +2243,8 @@ var Hero = function (_mix$with) {
 
             if (this.disabled) return;
 
+            this.justGotHit = false;
+
             console.log(this.name + " is taking damage: " + n);
             console.log(origin, "was origin of damage.");
 
@@ -2238,7 +2264,7 @@ var Hero = function (_mix$with) {
         value: function animate() {
 
             // Jumping
-            if (this.body.velocity.y !== 0) {
+            if (!this.body.touching.down) {
 
                 if (this.body.velocity.y < 0) {
                     this.animator.play('jump');

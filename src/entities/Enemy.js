@@ -20,12 +20,11 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
 
         this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
-        if (this.disabled && !this.body.onFloor())
+        if (this.disabled && !this.body.touching.down)
             return;
 
-        if (this.disabled && this.body.onFloor()) {
-            // Doesn't quite work
-            // this.resetMovement();
+        if (this.disabled && this.justGotHit && this.body.touching.down) {
+            this.justGotHit = false;
             return;
         }
 
@@ -91,7 +90,6 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
         this.faceTarget(this.currentTarget);
 
         this.busy = true;
-        this.priorityAnimation = true;
 
         // TODO: Remove magic numbers
         let currentAnim = this.animator.getAnimation('attack'),
@@ -121,6 +119,8 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
         if (this.disabled)
             return;
 
+        this.justGotHit = true;
+
         console.log(this.name + " is taking damage: " + n);
         console.log(origin, "was origin of damage.");
 
@@ -128,8 +128,8 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
         this.activeWeapon.disable();
 
         // Some cheeky knockback
-        this.body.velocity.x = Helpers.getTargetDirection(this.currentTarget.x, this.x) * -300;
-        this.body.velocity.y = -300;
+        this.body.velocity.x = Helpers.getTargetDirection(this.currentTarget.x, this.x) * -500;
+        this.body.velocity.y = -500;
 
         this.damageFlash();
 

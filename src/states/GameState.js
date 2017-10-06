@@ -35,10 +35,7 @@ class GameState {
         // https://phaser.io/examples/v2/loader/load-tilemap-json
         this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
-        this.game.load.image('col-atlas', 'resources/Tiles/col.png');
-        
-        //...
-        this.game.load.image('slope-atlas', 'resources/Tiles/arcade-slopes-64.png');
+        this.game.load.image('col-atlas', 'resources/Tiles/arcade-slopes-64.png');
 
     }
 
@@ -56,24 +53,11 @@ class GameState {
 
         // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
         let mapData = DSMapData.find(x => x.id === 'testlevel');
-        let world = new WorldBuilder(this.game, {
-            tilemap: 'level-tilemap',
-            layers: [
-                {
-                    name: 'world-sheet',
-                    cacheName: 'world-atlas',
-                    worldSizeLayer: true
-                },
-                {
-                    name: 'collidable',
-                    cacheName: 'col-atlas',
-                    collisionLayer: true
-                }
-            ]
-        });
+        let world = new WorldBuilder(this.game);
+        world.initializeWorld(mapData.world);
 
         // Should only be one needed per level so this is ok
-        this.collisionLayer = world.getCollisionLayer();
+        this.collisionLayer = world.getLayerByProperty('collisionLayer');
 
         // Make entities
         this.hero = new Hero(this.game, 250, 700, DSGameData.player.sprite, {
@@ -85,6 +69,9 @@ class GameState {
         this.hero.attachWeapon(DSGameData.weapons.find(x => x.id === DSGameData.player.equipment.value.primaryWeapon));
         this.hero.setBody(DSGameData.player.body);
 
+        // You must call this after any body size modifications have been made
+        world.enableSlopesFor(this.hero);
+
         if (DSGameData.player.animations && this.hero.animator)
             this.hero.animator.registerMany(DSGameData.player.animations);
 
@@ -94,36 +81,26 @@ class GameState {
 
         // TODO: Consider making the manifests available globally (no point making it complicated)
         let enemies = mapData.enemies.map(function (d) {
-            //return CreatureFactory.make(d.id, d.pos, this.game);
+            return CreatureFactory.make(d.id, d.pos, this.game);
         }, this);
 
-        // enemies.forEach((creatureSprite) => {
-        //     creatureSprite.setTarget(this.hero);
-        //     this.enemies.add(creatureSprite);
-        //     if (creatureSprite.activeWeapon)
-        //         this.enemyWeapons.add(creatureSprite.activeWeapon);
-        // });
+        enemies.forEach((creatureSprite) => {
+            world.enableSlopesFor(creatureSprite);
+            creatureSprite.setTarget(this.hero);
+            this.enemies.add(creatureSprite);
+            if (creatureSprite.activeWeapon)
+                this.enemyWeapons.add(creatureSprite.activeWeapon);
+        });
 
         // Finally, enable camera
         this.game.camera.follow(this.hero, Phaser.Camera.FOLLOW_TOPDOWN);
-
-        /////
-        //https://github.com/hexus/phaser-arcade-slopes
-        // Experimental (slopes)
-        let map = world.gameTileMap;
-
-        map.addTilesetImage('arcade-slopes-64', 'slope-atlas');
-        this.game.slopes.convertTilemapLayer(this.collisionLayer, 'arcadeslopes', 14);
-        this.game.slopes.enable(this.hero);
-
-        this.collisionLayer.debug = true;
 
     }
 
     update() {
 
-        this.game.physics.arcade.collide(this.hero, this.collisionLayer);
-        this.game.physics.arcade.collide(this.enemies, this.collisionLayer);
+        this.game.physics.arcade.collide(this.hero, this.collisionLayer.phaserLayer);
+        this.game.physics.arcade.collide(this.enemies, this.collisionLayer.phaserLayer);
 
         this.game.physics.arcade.overlap(this.hero.activeWeapon, this.enemies, function (weapon, npc) {
             npc.takeDamage(weapon.damageOutput(), {
