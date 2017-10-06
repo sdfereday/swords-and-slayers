@@ -1,6 +1,7 @@
 import 'pixi';
 import 'p2';
 import Phaser from 'phaser';
+import ArcadeSlopes from 'arcadeSlopes';
 
 //// TODO: Fix the problem with the relative import urls
 import DSMapData from '../stubs/MapData';

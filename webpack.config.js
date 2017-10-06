@@ -5,11 +5,14 @@ const path = require('path');
 
 let phaserModule = path.join(__dirname, '/node_modules/phaser-ce/');
 let b3Mod = path.join(__dirname, '/node_modules/behavior3js/');
+let sat = path.join(__dirname, '/node_modules/sat/');
+let arcadeSlopes = path.join(__dirname, '/libs/');
 
 module.exports = {
     entry: {
+        // Order matters here in vendor bundle (apparently)
         dist: path.resolve(__dirname, './src/game.js'),
-        vendor: ['pixi', 'p2', 'phaser', 'b3']
+        vendor: ['pixi', 'p2', 'phaser', 'sat', 'arcadeSlopes', 'b3']
     },
     output: {
         // We do this ([name]) as we've got two entry points above (otherwise they'll fight against each other)
@@ -22,9 +25,11 @@ module.exports = {
         // modules: [path.resolve(__dirname, 'libs')],
         extensions: ['.js', '.jsx', '.json'],
         alias: {
-            'phaser': path.join(phaserModule, 'build/custom/phaser-split.js'),
             'pixi': path.join(phaserModule, 'build/custom/pixi.js'),
             'p2': path.join(phaserModule, 'build/custom/p2.js'),
+            'phaser': path.join(phaserModule, 'build/custom/phaser-split.js'),
+            'sat': path.join(sat, 'SAT.min.js'),
+            'arcadeSlopes': path.join(arcadeSlopes, 'phaser-arcade-slopes.js'),
             'b3': path.join(b3Mod, 'libs/behavior3-0.2.2.js')
         }
     },
@@ -68,7 +73,8 @@ module.exports = {
         }),
         new webpack.ProvidePlugin({
             // It seems to fix the null ref issue, thought it's not reccommended (will look in to a better solution)
-            b3: 'b3'
+            b3: 'b3',
+            SAT: 'sat'
         }),
         new webpack.optimize.UglifyJsPlugin({
             drop_console: false,
