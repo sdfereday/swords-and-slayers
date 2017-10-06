@@ -1,9 +1,1 @@
-A war once raged between the northern realms and the southern kingdoms lasting for one hundred years. Driven by a deep routed hatred, and an excuse long forgotten, it was a tiresome century for all.
-
-To 'gracefully' end the war, the ruler of the north called upon his best and brightest mages in an attempt to harness magical constructs and weapons from the realm of nightmares. Alas, it's power proved too much for them to contain, and through it arrived the queen of nightmares herself... Tavnera.
-
-It wasn't long before Tavnera declared her grasp upon the north. Enslaving all who turned against her, the realm of nightmares began tighten its grip upon the world. The hundred year war it would seem was indeed now over. Replaced by a new enemy - darkness.
-
-However, as if a blessing from the stars themselves, a small band of warriors would take matters in to their own hands whilst all else cowered under the terrifying might of the goddess of nightmares.
-
-With unfathomable power, courage and spirit, they raised their blades towards the darkness to put an end to the final nightmare and to see peace return after a century of madness...
+- Hundred year war of the Dwarven clans has begun, with land and resource under threat, old blood rivals begin to fight each other for claim.- Unrest everywhere you turn, even though the landscapes are quite beautiful, some is war torn also.- You and your small clan get mixed up in it and cross blades with an evil clan who's moved in to the lands, wanting to take everything for themselves. They kidnap who doesn't resist, everyone but yourself, the leader, and those who resist. They slay your leader in the process (along with those who did resist, leaving you for dead). The leaders dying breath is for you to save the people of your clan from this terrible fate.- End up travelling the realms to save your clan from the evil clan, you pick up your blade and go to rescue them.- First chapter over, the rest is you slowly bringing the Dwarven people together. Meeting other races, etc. But that's for another day.
