@@ -11,6 +11,8 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
 
         super(game, x, y, name, data);
 
+        this.body.collideWorldBounds = true;
+
         if (this.config.behaviourId)
             this.behaviours = new Behaviours(this.config.behaviourId);
 

@@ -25,7 +25,7 @@ class Roam extends b3.Action {
         this.currentLocation.x = tick.target.x;
         this.currentLocation.y = tick.target.y;
 
-        this.destination.x = Helpers.getRandomInt(30, 770);
+        this.destination.x = Helpers.getRandomInt(10, 1240);
         this.destination.y = tick.target.y;
         
         console.log("Roam started...");

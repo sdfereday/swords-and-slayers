@@ -12,7 +12,6 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
         super(game, x, y, name, data);
 
         this.body.collideWorldBounds = true;
-        this.itype = '';
 
         this.jumps = 2;
         this.jumping = false;
