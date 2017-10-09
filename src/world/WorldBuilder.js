@@ -44,6 +44,9 @@ class WorldBuilder {
 
             this.gameTileMap.setCollisionByExclusion([0], true, collision.phaserLayer);
 
+            // Hide it
+            collision.phaserLayer.alpha = 0;
+
             if (this.game.slopes)
                 this.game.slopes.convertTilemapLayer(collision.phaserLayer, 'arcadeslopes', this.getTilesetByName(collision.layerData.name).firstgid);
 
@@ -60,7 +63,7 @@ class WorldBuilder {
         this.game.slopes.preferY = true;
 
         // Debugs the phaser layer (in case you didn't notice)
-        collision.phaserLayer.debug = true;
+        //collision.phaserLayer.debug = true;
 
     }
 
@@ -93,7 +96,8 @@ class WorldBuilder {
         // Prefer the minimum Y offset for this physics body,
         // it's turned way up to avoid animation glitch when leaving
         // flat to slope (experiment with it)
-        let pulldownValue = 1250;
+        // Beware in lower resolutions, this needs to be reduced dramatically.
+        let pulldownValue = 1250 / 4;
 
         // Apply these to prevent sliding and 'over zelousness' on y axis
         ent.body.slopes.preferY = true;

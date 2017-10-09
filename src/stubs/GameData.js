@@ -27,8 +27,8 @@ let gameData = {
         },
         config: {
             value: {
-                movementSpeed: 400, // pixels/second/second
-                jumpSpeed: -700 // pixels/second (negative y is up)
+                movementSpeed: 100, // pixels/second/second
+                jumpSpeed: -200 // pixels/second (negative y is up)
             }
         },
         animations: [

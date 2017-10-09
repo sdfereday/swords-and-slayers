@@ -20,7 +20,8 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
 
     update() {
 
-        this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
+        if(this.activeWeapon)
+            this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
         if (this.disabled && !this.body.touching.down)
             return;
@@ -41,7 +42,7 @@ class Enemy extends mix(BaseEntity).with(HitEffects, AttachedWeapon) {
             this.behaviours.setVariable('inRangeOfAttack', d < this.config.attackRange);
         }
 
-        this.animate();
+        //this.animate();
 
     }
 

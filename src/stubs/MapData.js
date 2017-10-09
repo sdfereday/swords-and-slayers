@@ -25,8 +25,8 @@ const MapData = [
             {
                 id: 'bug',
                 pos: {
-                    x: 150,
-                    y: 100
+                    x: 50,
+                    y: 0
                 }
             }
         ]

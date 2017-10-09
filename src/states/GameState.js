@@ -29,14 +29,24 @@ class GameState {
 
     preload() {
 
-        this.game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 20);
-        this.game.load.spritesheet('enemy', 'resources/Game/enemy.png', 128, 128, 20);
-        this.game.load.image('ground', 'resources/Game/platform tile2.png', 32, 32);
+        // scale the game 4x
+        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
+        this.game.scale.setUserScale(8, 8);
+
+        // enable crisp rendering
+        this.game.renderer.renderSession.roundPixels = true;  
+        Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)  
+
+        // this.game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 20);
+        // this.game.load.spritesheet('enemy', 'resources/Game/enemy.png', 128, 128, 20);
+
+        this.game.load.image('player', 'resources/Game/player-lr.png', 16, 16);
+        this.game.load.image('enemy', 'resources/Game/enemy-lr.png', 16, 16);
 
         // https://phaser.io/examples/v2/loader/load-tilemap-json
         this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
-        this.game.load.image('col-atlas', 'resources/Tiles/arcade-slopes-64.png');
+        this.game.load.image('col-atlas', 'resources/Tiles/arcade-slopes-16.png');
 
     }
 
@@ -47,7 +57,7 @@ class GameState {
 
         // Startup physics
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.game.physics.arcade.gravity.y = 2500; // pixels/second/second
+        this.game.physics.arcade.gravity.y = 1500; // pixels/second/second
         this.game.physics.arcade.TILE_BIAS = 40; // Prevents strange tile fall-through
 
         this.game.stage.backgroundColor = '#2d2d2d';
@@ -61,14 +71,14 @@ class GameState {
         this.collisionLayer = world.getLayerByProperty('collisionLayer');
 
         // Make entities
-        this.hero = new Hero(this.game, 250, 700, DSGameData.player.sprite, {
+        this.hero = new Hero(this.game, 0, 0, DSGameData.player.sprite, {
             config: DSGameData.player.config,
             stats: DSGameData.player.stats,
             equipment: DSGameData.player.equipment
         });
 
-        this.hero.attachWeapon(DSGameData.weapons.find(x => x.id === DSGameData.player.equipment.value.primaryWeapon));
-        this.hero.setBody(DSGameData.player.body);
+        //this.hero.attachWeapon(DSGameData.weapons.find(x => x.id === DSGameData.player.equipment.value.primaryWeapon));
+        //this.hero.setBody(DSGameData.player.body);
 
         // You must call this after any body size modifications have been made
         world.enableSlopesFor(this.hero);
@@ -81,17 +91,17 @@ class GameState {
         this.enemyWeapons = this.game.add.group();
 
         // TODO: Consider making the manifests available globally (no point making it complicated)
-        let enemies = mapData.enemies.map(function (d) {
-            return CreatureFactory.make(d.id, d.pos, this.game);
-        }, this);
+        // let enemies = mapData.enemies.map(function (d) {
+        //     return CreatureFactory.make(d.id, d.pos, this.game);
+        // }, this);
 
-        enemies.forEach((creatureSprite) => {
-            world.enableSlopesFor(creatureSprite);
-            creatureSprite.setTarget(this.hero);
-            this.enemies.add(creatureSprite);
-            if (creatureSprite.activeWeapon)
-                this.enemyWeapons.add(creatureSprite.activeWeapon);
-        });
+        // enemies.forEach((creatureSprite) => {
+        //     world.enableSlopesFor(creatureSprite);
+        //     creatureSprite.setTarget(this.hero);
+        //     this.enemies.add(creatureSprite);
+        //     if (creatureSprite.activeWeapon)
+        //         this.enemyWeapons.add(creatureSprite.activeWeapon);
+        // });
 
         // Post process anything else that needs doing to the world before game starts (layer sorting, lights, etc),
         // note that this needs to happen 'after' entities are placed so z-indexing works.

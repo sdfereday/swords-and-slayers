@@ -22,7 +22,8 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
 
     update() {
 
-        this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
+        if(this.activeWeapon)
+            this.activeWeapon.anchorTo(this.x, this.y + (this.activeWeapon.height));
 
         if (this.disabled && !this.body.touching.down)
             return;
@@ -33,7 +34,7 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
         }
 
         this.inputUpdate();
-        this.animate();
+        //this.animate();
 
     }
 
