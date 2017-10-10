@@ -97,7 +97,7 @@ class WorldBuilder {
         // it's turned way up to avoid animation glitch when leaving
         // flat to slope (experiment with it)
         // Beware in lower resolutions, this needs to be reduced dramatically.
-        let pulldownValue = 1250 / 4;
+        let pulldownValue = 150;
 
         // Apply these to prevent sliding and 'over zelousness' on y axis
         ent.body.slopes.preferY = true;
