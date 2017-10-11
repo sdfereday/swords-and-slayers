@@ -3,7 +3,8 @@ const SceneNodeTypes = {
     "PARALLEL": 1,
     "ANIM": 2,
     "MOVE": 3,
-    "SEQUENCE": 4
+    "SEQUENCE": 4,
+    "FADE": 5
 };
 
 export default SceneNodeTypes;

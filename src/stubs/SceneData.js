@@ -4,7 +4,16 @@ import NodeTypes from '../enums/SceneNodeTypes';
 const SceneData = [
     {
         id: "scene-1",
+        nextScene: "scene-2",
         sequence: [
+            {
+                name: "Fade",
+                type: NodeTypes.FADE,
+                waitForInput: false,
+                data: {
+                    dir: 1
+                }
+            },
             {
                 name: "Talk",
                 type: NodeTypes.TALK,
@@ -83,9 +92,18 @@ const SceneData = [
             {
                 name: "Anim",
                 type: NodeTypes.ANIM,
+                waitForInput: false,
                 data: {
                     targetId: "mum",
                     animName: "runstumble"
+                }
+            },
+            {
+                name: "Fade",
+                type: NodeTypes.FADE,
+                waitForInput: false,
+                data: {
+                    dir: -1
                 }
             }
         ]

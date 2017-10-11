@@ -11,10 +11,14 @@ class Anim extends SceneNode {
 
     }
 
-    enter() {
+    enter(params) {
 
-        this.isDone = true;
+        this.isDone = false;
         console.log("Play", this.animation);
+
+        params.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
+            this.isDone = true;
+        }, this);
 
     }
 

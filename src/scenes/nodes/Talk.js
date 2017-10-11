@@ -17,6 +17,7 @@ class Talk extends SceneNode {
     
         console.log(this.name);
         console.log(this.str);
+        console.log(params);
 
         if(!params || !params.actors)
             return;

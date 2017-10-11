@@ -13,6 +13,12 @@ import Hero from '../entities/Hero';
 
 class TheatreState {
 
+    init(params) {
+
+        console.log("State change params:", params);
+
+    }
+
     preload() {
         
         // Load plugins
@@ -83,16 +89,18 @@ class TheatreState {
         });
 
         // Scene data sequence for this scene
-        this.sceneManager = new SceneManager('scene-1');
+        this.sceneManager = new SceneManager('scene-1', this.game);
         this.sceneManager.start({
-            actors
+            actors: actors,
+            camera: this.game.camera,
+            game: this.game
         });
 
         // Bind input key
         this.interactionKey = this.game.input.keyboard.addKey(Phaser.Keyboard.E);
         this.interactionKey.onDown.add(x => {
 
-            this.sceneManager.next({ actors });
+            this.sceneManager.next();
 
         }, this);
 
@@ -100,8 +108,10 @@ class TheatreState {
         // note that this needs to happen 'after' actors are placed so z-indexing works.
         world.postProcess();
 
-        // This is temporary
-        this.game.camera.follow(actors[0].sprite, Phaser.Camera.FOLLOW_TOPDOWN);
+        // This is temporary, take a look here: http://phaser.io/docs/2.4.7/Phaser.Camera.html#fx
+        // Some stuff like 'focus on' which is very useful.
+        //this.game.camera.follow(actors[1].sprite, Phaser.Camera.FOLLOW_TOPDOWN);
+        this.game.camera.focusOnXY(this.game.width / 2, this.game.height);
         
     }
 

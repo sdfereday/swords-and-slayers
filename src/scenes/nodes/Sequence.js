@@ -9,7 +9,6 @@ class Sequence extends SceneNode {
         this.name = 'Sequence';
         this.children = children;
         this.len = children.length - 1;
-        this.isDone = false;
 
         this.currentNodeIndex = 0;
 

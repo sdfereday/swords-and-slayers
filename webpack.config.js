@@ -12,7 +12,7 @@ module.exports = {
     entry: {
         // Order matters here in vendor bundle (apparently)
         dist: path.resolve(__dirname, './src/game.js'),
-        vendor: ['pixi', 'p2', 'phaser', 'sat', 'arcadeSlopes', 'miniEvents', 'b3']
+        vendor: ['pixi', 'p2', 'phaser', 'sat', 'arcadeSlopes', 'miniEvents', 'b3', 'react']
     },
     output: {
         // We do this ([name]) as we've got two entry points above (otherwise they'll fight against each other)

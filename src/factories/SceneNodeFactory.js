@@ -5,6 +5,7 @@ import Parallel from '../scenes/nodes/Parallel';
 import Sequence from '../scenes/nodes/Sequence';
 import Anim from '../scenes/nodes/Anim';
 import Move from '../scenes/nodes/Move';
+import Fade from '../scenes/nodes/Fade';
 
 // Experimental
 // https://k94n.com/es6-modules-single-instance-pattern
@@ -13,7 +14,8 @@ const nodeClasses = {
     Parallel,
     Sequence,
     Anim,
-    Move
+    Move,
+    Fade
 };
 
 class BehaviourFactory {
@@ -54,6 +56,8 @@ class BehaviourFactory {
             case NodeTypes.MOVE:
                 return new CNS(nd.data, nd.waitForInput);
             case NodeTypes.ANIM:
+                return new CNS(nd.data, nd.waitForInput);
+            case NodeTypes.FADE:
                 return new CNS(nd.data, nd.waitForInput);
             case NodeTypes.SEQUENCE:
                 return new CNS(children, nd.waitForInput);

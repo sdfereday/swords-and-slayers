@@ -9,7 +9,6 @@ class Parallel extends SceneNode {
         this.name = 'Parallel';
         this.children = children;
         this.len = children.length;
-        this.isDone = false;
 
         // Unique to this node (for now)
         this.started = false;
