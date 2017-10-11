@@ -82,6 +82,104 @@ let gameData = {
             }
         }
     ],
+    actors: [
+        {
+            id: 'penny',
+            sprite: 'player',
+            body: {
+                x: 48,
+                y: 48,
+                w: 38,
+                h: 80
+            },
+            config: {
+                value: {
+                    movementSpeed: 100, // pixels/second/second
+                    jumpSpeed: -200 // pixels/second (negative y is up)
+                }
+            },
+            animations: [
+                {
+                    name: 'idle',
+                    frames: Helpers.numberArray(3, 6),
+                    fps: 3,
+                    loops: true
+                },
+                {
+                    name: 'run',
+                    frames: Helpers.numberArray(12, 18),
+                    fps: 12,
+                    loops: true
+                },
+                {
+                    name: 'attack',
+                    frames: Helpers.numberArray(1, 3),
+                    fps: 10,
+                    loops: false
+                },
+                {
+                    name: 'jump',
+                    frames: [7],
+                    fps: 8,
+                    loops: false
+                },
+                {
+                    name: 'fall',
+                    frames: [18],
+                    fps: 8,
+                    loops: false
+                }
+            ]
+        },
+        {
+            id: 'mum',
+            sprite: 'player',
+            body: {
+                x: 48,
+                y: 48,
+                w: 38,
+                h: 80
+            },
+            config: {
+                value: {
+                    movementSpeed: 100, // pixels/second/second
+                    jumpSpeed: -200 // pixels/second (negative y is up)
+                }
+            },
+            animations: [
+                {
+                    name: 'idle',
+                    frames: Helpers.numberArray(3, 6),
+                    fps: 3,
+                    loops: true
+                },
+                {
+                    name: 'run',
+                    frames: Helpers.numberArray(12, 18),
+                    fps: 12,
+                    loops: true
+                },
+                {
+                    name: 'attack',
+                    frames: Helpers.numberArray(1, 3),
+                    fps: 10,
+                    loops: false
+                },
+                {
+                    name: 'jump',
+                    frames: [7],
+                    fps: 8,
+                    loops: false
+                },
+                {
+                    name: 'fall',
+                    frames: [18],
+                    fps: 8,
+                    loops: false
+                }
+            ]
+        }
+    ],
     creatures: [
         {
             id: 'bug',

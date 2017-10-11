@@ -1,6 +1,7 @@
 import 'pixi';
 import 'p2';
 import Phaser from 'phaser';
+import SceneState from './states/SceneState';
 import GameState from './states/GameState';
 
 class Game extends Phaser.Game {
@@ -8,8 +9,9 @@ class Game extends Phaser.Game {
   constructor() {
     // https://pacoup.com/2011/06/12/list-of-true-169-resolutions/
     super(192, 108, Phaser.AUTO, 'phaser-example', null);
+    this.state.add('SceneState', SceneState, false);
 		this.state.add('GameState', GameState, false);
-		this.state.start('GameState');
+		this.state.start('SceneState');
   }
 
 }

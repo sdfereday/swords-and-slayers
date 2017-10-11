@@ -18,9 +18,7 @@ class BaseEntity extends Phaser.Sprite {
         this.activeWeapon = null;
 
         // Define properties with supplied data (TODO: Revise method)
-        if (data) {
-            Object.defineProperties(this, data);
-        }
+        this.mountData(data);
 
         // Flags
         this.busy = false;
@@ -31,20 +29,30 @@ class BaseEntity extends Phaser.Sprite {
         this.anchor.x = 0.5;
 
         // Animations setup
-        this.animator = new Animator(this.animations);
+        if (this.animations)
+            this.animator = new Animator(this.animations);
+
+    }
+
+    mountData(data) {
+
+        if (data.config)
+            Object.defineProperties(this.config, data.config);
+
+        if (data.stats)
+            Object.defineProperties(this.stats, data.stats);
+
+        if (data.equipment)
+            Object.defineProperties(this.equipment, data.equipment);
+
+        if (data.body)
+            this.body.setSize(data.body.x, data.body.y, data.body.w, data.body.h);
 
     }
 
     resetMovement() {
 
         this.body.velocity.x = 0;
-
-    }
-
-    setBody(bodyData) {
-
-        this.body.setSize(bodyData.x, bodyData.y, bodyData.w, bodyData.h);
-        return this;
 
     }
 
