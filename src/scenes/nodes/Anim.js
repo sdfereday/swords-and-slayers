@@ -14,6 +14,7 @@ class Anim extends SceneNode {
     enter() {
 
         this.isDone = true;
+        console.log("Play", this.animation);
 
     }
 

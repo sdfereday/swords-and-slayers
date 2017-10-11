@@ -2,16 +2,18 @@
 import NodeTypes from '../enums/SceneNodeTypes';
 import Talk from '../scenes/nodes/Talk';
 import Parallel from '../scenes/nodes/Parallel';
+import Sequence from '../scenes/nodes/Sequence';
 import Anim from '../scenes/nodes/Anim';
 import Move from '../scenes/nodes/Move';
 
 // Experimental
 // https://k94n.com/es6-modules-single-instance-pattern
 const nodeClasses = {
-    'Talk': Talk,
-    'Parallel': Parallel,
-    'Anim': Anim,
-    'Move': Move
+    Talk,
+    Parallel,
+    Sequence,
+    Anim,
+    Move
 };
 
 class BehaviourFactory {
@@ -53,10 +55,10 @@ class BehaviourFactory {
                 return new CNS(nd.data, nd.waitForInput);
             case NodeTypes.ANIM:
                 return new CNS(nd.data, nd.waitForInput);
+            case NodeTypes.SEQUENCE:
+                return new CNS(children, nd.waitForInput);
             case NodeTypes.PARALLEL:
-                return new CNS({
-                    children
-                }, nd.waitForInput);
+                return new CNS(children, nd.asynced, nd.waitForInput);
             default:
                 throw new Error("Unrecognized node type:" + nd.type);
         }

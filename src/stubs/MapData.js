@@ -56,8 +56,9 @@ const MapData = [
         actors: [
             {
                 id: 'penny',
+                startFacing: -1,
                 pos: {
-                    x: 50,
+                    x: 135,
                     y: 0
                 }
             },

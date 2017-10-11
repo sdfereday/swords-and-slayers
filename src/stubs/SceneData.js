@@ -48,7 +48,7 @@ const SceneData = [
             {
                 name: "Parallel",
                 type: NodeTypes.PARALLEL,
-                waitForInput: false,
+                asynced: true,
                 children: [
                     {
                         name: "Talk",
@@ -64,8 +64,8 @@ const SceneData = [
                         type: NodeTypes.MOVE,
                         data: {
                             targetId: "penny",
-                            speed: 200,
-                            x: 0,
+                            speed: 75,
+                            x: 350, // 135 origin
                             y: 0
                         }
                     }
@@ -74,6 +74,7 @@ const SceneData = [
             {
                 name: "Talk",
                 type: NodeTypes.TALK,
+                waitForInput: false,
                 data: {
                     targetId: "mum",
                     str: "{{playername}} wait! Come back! It's too dangerous in the forest alone!"
@@ -82,7 +83,6 @@ const SceneData = [
             {
                 name: "Anim",
                 type: NodeTypes.ANIM,
-                waitForInput: false,
                 data: {
                     targetId: "mum",
                     animName: "runstumble"

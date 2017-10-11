@@ -11,10 +11,12 @@ class Move extends SceneNode {
 
         this.targetId = data.targetId;
         this.currentTarget = null;
+
         this.config = {
             x: data.x,
             y: data.y,
-            speed: data.speed
+            speed: data.speed,
+            ignoreY: true
         };
 
     }
@@ -29,16 +31,18 @@ class Move extends SceneNode {
     }
 
     update() {
-        
-        this.isDone = true;
 
-        return;
+        if(this.isDone)
+            return;
 
         this.isDone = this.currentTarget.moveTo({
             x: this.config.x,
-            y: this.config.y,
+            y: this.config.ignoreY ? this.currentTarget.y : this.config.y,
             speed: this.config.speed
         });
+
+        if(this.isDone)
+            this.currentTarget.stop();
 
     }
 

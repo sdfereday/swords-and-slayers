@@ -1,4 +1,5 @@
 import SceneNode from '../nodes/SceneNode';
+import EventManager from '../../events/EventManager';
 
 class Talk extends SceneNode {
 
@@ -23,6 +24,8 @@ class Talk extends SceneNode {
         let target = params.actors.find(x => x.data.id === this.targetId);
 
         this.isDone = true;
+
+        EventManager.Trigger('onChat', this.str);
 
     }
 

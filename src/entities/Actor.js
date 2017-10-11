@@ -8,31 +8,33 @@ class Actor extends mix(BaseEntity).with() {
 
     update() {
 
-        this.resetMovement();
-
         //this.animate();
 
     }
 
     /// AI Movement ///
-    moveTo(dir) {
+    stop() {
 
-        
-
-        this.body.velocity.x += dir > 0 ? this.config.movementSpeed : -this.config.movementSpeed;
-        this.correctScale(dir);
+        console.log("Actor stopped at", new Date().getTime());
+        this.resetMovement();
 
     }
 
-    moveTo(pos, speed) {
+    moveTo(data) {
 
-        if (Helpers.distance(this, pos) < this.width / 3)
-            return true;
+        this.resetMovement();
 
-        let dir = Helpers.getTargetDirection(pos.x, this.x);
+        let pos = {
+            x: data.x,
+            y: data.y
+        };
         
-        this.body.velocity.x += dir > 0 ? speed : -speed;
+        let dir = Helpers.getTargetDirection(pos.x, this.x);
+
+        this.body.velocity.x = dir > 0 ? data.speed : -data.speed;
         this.correctScale(dir);
+
+        return Helpers.distance(this, pos) < this.width / 3;
 
     }
 

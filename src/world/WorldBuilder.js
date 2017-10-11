@@ -60,7 +60,8 @@ class WorldBuilder {
 
         // We're assuming this is a platform game right now (see site for more info)
         // Prefer the minimum Y offset globally (also see 'enableSlopesFor')
-        this.game.slopes.preferY = true;
+        if(this.game.slopes)
+            this.game.slopes.preferY = true;
 
         // Debugs the phaser layer (in case you didn't notice)
         //collision.phaserLayer.debug = true;
@@ -90,6 +91,9 @@ class WorldBuilder {
     }
 
     enableSlopesFor(ent) {
+
+        if(!this.game.slopes || !ent)
+            return;
 
         this.game.slopes.enable(ent);
 

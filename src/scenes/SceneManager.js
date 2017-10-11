@@ -9,8 +9,8 @@ class SceneManager {
         this.currentSceneIndex = 0;
         this.currentAction = null;
         this.started = false;
+        this.ran = false;
 
-        // Parse behaviour data in to useable tree
         this.sceneData = SceneNodeFactory.mount(DSScenes.find(x => x.id === sceneId).sequence);
 
     }
@@ -22,6 +22,15 @@ class SceneManager {
 
         this.current.update();
 
+        // TODO: Put in standard loop, foreach is very slow...
+        this.sceneData.forEach((x) => {
+            
+            // ...so is object comparison ---------------v
+            if(!x.isDone && x.started && x.asynced && x !== this.current)
+                x.update();
+
+        }, this);
+
         if (this.current.isDone && !this.current.waitForInput) {
             this.current.exit();
             this.next();
@@ -31,21 +40,22 @@ class SceneManager {
 
     next(params) {
 
+        if (this.ran || this.current && !this.current.isDone && !this.current.asynced)
+            return;
+
         if (!this.started)
             throw new Error("You must start the sequence before calling 'next'.");
-        
-        if (this.currentSceneIndex >= this.sceneData.length - 1) {
-            this.started = false;
-            this.onFinished();
-        }
-
-        if (this.current && !this.current.isDone)
-            return;
 
         this.current = this.sceneData[this.currentSceneIndex];
         this.current.enter(params);
 
         this.currentSceneIndex += 1;
+
+        if (this.currentSceneIndex > this.sceneData.length - 1) {
+            this.started = false;
+            this.ran = true;
+            this.onFinished();
+        }
 
     }
 
@@ -62,7 +72,7 @@ class SceneManager {
 
     onFinished() {
 
-        console.log("Sequence is complete.");
+        console.log("Sequence finished at", new Date().getTime());
 
     }
 

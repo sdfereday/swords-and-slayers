@@ -1,7 +1,6 @@
 import 'pixi';
 import 'p2';
 import Phaser from 'phaser';
-import ArcadeSlopes from 'arcadeSlopes';
 
 //// TODO: Fix the problem with the relative import urls
 import DSMapData from '../stubs/MapData';
@@ -12,27 +11,12 @@ import WorldBuilder from '../world/WorldBuilder';
 import ActorFactory from '../factories/ActorFactory';
 import Hero from '../entities/Hero';
 
-/*
-
-Now, the theatre state lifts all input from the user (bar chat text) and cycles through
-a preset bunch of actions that either act in parallel or not at all.
-
-It'd be best to store these separate in stubs, but adding them to tree data is probably
-the best place to pop them. Obviously a couple of custom ones will be needed.
-
-So to start with, we need the following as a proof of function:
-- Two actors walk on to stage
-- Start a conversation piece between them (with chat animations)
-- When done, one of them runs off to the right, the other has a sad animation
-
-That's pretty much most of it in place. Should also be able to move the camera and such too.
-You name it, anyway, have a go.
-
-*/
-
 class TheatreState {
 
     preload() {
+        
+        // Load plugins
+        this.game.plugins.add(Phaser.Plugin.ArcadeSlopes);
 
         // scale the game 4x
         this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -57,7 +41,7 @@ class TheatreState {
         this.game.load.image('enemy', 'resources/Game/enemy-lr.png', 16, 16);
 
         // https://phaser.io/examples/v2/loader/load-tilemap-json
-        this.game.load.tilemap('level-tilemap', 'resources/Game/maps/world-sheet.json', null, Phaser.Tilemap.TILED_JSON);
+        this.game.load.tilemap('level-introduction', 'resources/Game/maps/intro.json', null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image('world-atlas', 'resources/Tiles/world-sheet.png');
         this.game.load.image('col-atlas', 'resources/Tiles/arcade-slopes-16.png');
 
@@ -73,11 +57,11 @@ class TheatreState {
 
         // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
         let mapData = DSMapData.find(x => x.id === 'introduction');
-        // let world = new WorldBuilder(this.game);
-        // world.initializeWorld(mapData.world);
+        let world = new WorldBuilder(this.game);
+        world.initializeWorld(mapData.world);
 
         // Should only be one needed per level so this is ok
-        //this.collisionLayer = world.getLayerByProperty('collisionLayer');
+        this.collisionLayer = world.getLayerByProperty('collisionLayer');
 
         // Make entities
         this.actors = this.game.add.group();
@@ -89,7 +73,13 @@ class TheatreState {
         }, this);
 
         actors.forEach((actor) => {
+            
             this.actors.add(actor.sprite);
+            world.enableSlopesFor(actor.sprite);
+
+            if(actor.data.startFacing)
+                actor.sprite.correctScale(actor.data.startFacing);
+
         });
 
         // Scene data sequence for this scene
@@ -108,13 +98,16 @@ class TheatreState {
 
         // Post process anything else that needs doing to the world before game starts (layer sorting, lights, etc),
         // note that this needs to happen 'after' actors are placed so z-indexing works.
-        //world.postProcess();
+        world.postProcess();
 
+        // This is temporary
+        this.game.camera.follow(actors[0].sprite, Phaser.Camera.FOLLOW_TOPDOWN);
+        
     }
 
     update() {
 
-        //this.game.physics.arcade.collide(this.actors, this.collisionLayer.phaserLayer);
+        this.game.physics.arcade.collide(this.actors, this.collisionLayer.phaserLayer);
         this.sceneManager.update();
 
     }

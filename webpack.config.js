@@ -6,13 +6,13 @@ const path = require('path');
 let phaserModule = path.join(__dirname, '/node_modules/phaser-ce/');
 let b3Mod = path.join(__dirname, '/node_modules/behavior3js/');
 let sat = path.join(__dirname, '/node_modules/sat/');
-let arcadeSlopes = path.join(__dirname, '/libs/');
+let libs = path.join(__dirname, '/libs/');
 
 module.exports = {
     entry: {
         // Order matters here in vendor bundle (apparently)
         dist: path.resolve(__dirname, './src/game.js'),
-        vendor: ['pixi', 'p2', 'phaser', 'sat', 'arcadeSlopes', 'b3']
+        vendor: ['pixi', 'p2', 'phaser', 'sat', 'arcadeSlopes', 'miniEvents', 'b3']
     },
     output: {
         // We do this ([name]) as we've got two entry points above (otherwise they'll fight against each other)
@@ -29,7 +29,8 @@ module.exports = {
             'p2': path.join(phaserModule, 'build/custom/p2.js'),
             'phaser': path.join(phaserModule, 'build/custom/phaser-split.js'),
             'sat': path.join(sat, 'SAT.min.js'),
-            'arcadeSlopes': path.join(arcadeSlopes, 'phaser-arcade-slopes.js'),
+            'arcadeSlopes': path.join(libs, 'phaser-arcade-slopes.js'),
+            'miniEvents': path.join(libs, 'mini-events-min.js'),
             'b3': path.join(b3Mod, 'libs/behavior3-0.2.2.js')
         }
     },
@@ -48,16 +49,17 @@ module.exports = {
                 use: ['expose-loader?p2']
             },
             {
-                test: /\.js$/,
+                test: /\.(js|jsx)$/,
                 use: [
                     {
                         loader: 'babel-loader',
                         options: {
-                            presets: ['env']
+                            presets: ['env', 'react']
                         }
                     }
                 ],
                 include: path.resolve(__dirname, 'src'),
+                exclude: path.resolve(__dirname, 'node_modules')
             }
         ],
     },
