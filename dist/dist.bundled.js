@@ -136,12 +136,7 @@ var SceneNode = function () {
 exports.default = SceneNode;
 
 /***/ }),
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -364,6 +359,11 @@ var gameData = {
 exports.default = gameData;
 
 /***/ }),
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
 /* 13 */,
 /* 14 */,
 /* 15 */
@@ -1629,9 +1629,9 @@ module.exports = getActiveElement;
 "use strict";
 
 
-__webpack_require__(9);
+__webpack_require__(10);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _phaser = __webpack_require__(5);
 
@@ -1697,9 +1697,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 //// TODO: Fix the problem with the relative import urls
 
 
-__webpack_require__(9);
+__webpack_require__(10);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _phaser = __webpack_require__(5);
 
@@ -1709,7 +1709,7 @@ var _MapData = __webpack_require__(20);
 
 var _MapData2 = _interopRequireDefault(_MapData);
 
-var _GameData = __webpack_require__(12);
+var _GameData = __webpack_require__(7);
 
 var _GameData2 = _interopRequireDefault(_GameData);
 
@@ -2141,7 +2141,7 @@ var _EventManager = __webpack_require__(23);
 
 var _EventManager2 = _interopRequireDefault(_EventManager);
 
-var _GameData = __webpack_require__(12);
+var _GameData = __webpack_require__(7);
 
 var _GameData2 = _interopRequireDefault(_GameData);
 
@@ -2629,7 +2629,7 @@ var _Actor = __webpack_require__(52);
 
 var _Actor2 = _interopRequireDefault(_Actor);
 
-var _GameData = __webpack_require__(12);
+var _GameData = __webpack_require__(7);
 
 var _GameData2 = _interopRequireDefault(_GameData);
 
@@ -3064,9 +3064,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 //// TODO: Fix the problem with the relative import urls
 
 
-__webpack_require__(9);
+__webpack_require__(10);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _phaser = __webpack_require__(5);
 
@@ -3080,7 +3080,7 @@ var _MapData = __webpack_require__(20);
 
 var _MapData2 = _interopRequireDefault(_MapData);
 
-var _GameData = __webpack_require__(12);
+var _GameData = __webpack_require__(7);
 
 var _GameData2 = _interopRequireDefault(_GameData);
 
@@ -3272,7 +3272,7 @@ var _Enemy = __webpack_require__(58);
 
 var _Enemy2 = _interopRequireDefault(_Enemy);
 
-var _GameData = __webpack_require__(12);
+var _GameData = __webpack_require__(7);
 
 var _GameData2 = _interopRequireDefault(_GameData);
 
@@ -4253,7 +4253,7 @@ exports.default = BoolCheck;
 "use strict";
 
 
-var _react = __webpack_require__(7);
+var _react = __webpack_require__(8);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -4332,7 +4332,7 @@ if (process.env.NODE_ENV === 'production') {
  LICENSE file in the root directory of this source tree.
  Modernizr 3.0.0pre (Custom Build) | MIT
 */
-var aa=__webpack_require__(7);__webpack_require__(4);var l=__webpack_require__(19),n=__webpack_require__(8),ba=__webpack_require__(33),ca=__webpack_require__(3),da=__webpack_require__(13),ea=__webpack_require__(34),fa=__webpack_require__(35),ha=__webpack_require__(36),ia=__webpack_require__(37);
+var aa=__webpack_require__(8);__webpack_require__(4);var l=__webpack_require__(19),n=__webpack_require__(9),ba=__webpack_require__(33),ca=__webpack_require__(3),da=__webpack_require__(13),ea=__webpack_require__(34),fa=__webpack_require__(35),ha=__webpack_require__(36),ia=__webpack_require__(37);
 function w(a){for(var b=arguments.length-1,c="Minified React error #"+a+"; visit http://facebook.github.io/react/docs/error-decoder.html?invariant\x3d"+a,d=0;d<b;d++)c+="\x26args[]\x3d"+encodeURIComponent(arguments[d+1]);b=Error(c+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings.");b.name="Invariant Violation";b.framesToPop=1;throw b;}aa?void 0:w("227");
 function ja(a){switch(a){case "svg":return"http://www.w3.org/2000/svg";case "math":return"http://www.w3.org/1998/Math/MathML";default:return"http://www.w3.org/1999/xhtml"}}
 var ka={Namespaces:{html:"http://www.w3.org/1999/xhtml",mathml:"http://www.w3.org/1998/Math/MathML",svg:"http://www.w3.org/2000/svg"},getIntrinsicNamespace:ja,getChildNamespace:function(a,b){return null==a||"http://www.w3.org/1999/xhtml"===a?ja(b):"http://www.w3.org/2000/svg"===a&&"foreignObject"===b?"http://www.w3.org/1999/xhtml":a}},la=null,oa={};
@@ -4657,10 +4657,10 @@ if (process.env.NODE_ENV !== "production") {
 
 'use strict';
 
-var react = __webpack_require__(7);
+var react = __webpack_require__(8);
 var invariant = __webpack_require__(4);
 var ExecutionEnvironment = __webpack_require__(19);
-var _assign = __webpack_require__(8);
+var _assign = __webpack_require__(9);
 var EventListener = __webpack_require__(33);
 var require$$0 = __webpack_require__(14);
 var hyphenateStyleName = __webpack_require__(78);
@@ -22136,7 +22136,7 @@ if (process.env.NODE_ENV !== 'production') {
 var emptyFunction = __webpack_require__(3);
 var invariant = __webpack_require__(4);
 var warning = __webpack_require__(14);
-var assign = __webpack_require__(8);
+var assign = __webpack_require__(9);
 
 var ReactPropTypesSecret = __webpack_require__(18);
 var checkPropTypes = __webpack_require__(17);
@@ -22747,7 +22747,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(7);
+var _react = __webpack_require__(8);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22759,7 +22759,7 @@ var _animejs = __webpack_require__(88);
 
 var _animejs2 = _interopRequireDefault(_animejs);
 
-var _AnimeAnims = __webpack_require__(90);
+var _AnimeAnims = __webpack_require__(89);
 
 var _AnimeAnims2 = _interopRequireDefault(_AnimeAnims);
 
@@ -22951,11 +22951,10 @@ n)k=l;else{var l=h,h=h+.1,g=0;do m=l+(h-l)/2,n=a(m,c,b)-k,0<n?h=m:l=m;while(1e-7
 d:A.apply($jscomp$this,d)}}(f)),f={type:f.type};return b}(),ha={css:function(a,c,d){return a.style[c]=d},attribute:function(a,c,d){return a.setAttribute(c,d)},object:function(a,c,d){return a[c]=d},transform:function(a,c,d,b,f){b[f]||(b[f]=[]);b[f].push(c+"("+d+")")}},v=[],B=0,ia=function(){function a(){B=requestAnimationFrame(c)}function c(c){var b=v.length;if(b){for(var d=0;d<b;)v[d]&&v[d].tick(c),d++;a()}else cancelAnimationFrame(B),B=0}return a}();q.version="2.2.0";q.speed=1;q.running=v;q.remove=
 function(a){a=P(a);for(var c=v.length;c--;)for(var d=v[c],b=d.animations,f=b.length;f--;)u(a,b[f].animatable.target)&&(b.splice(f,1),b.length||d.pause())};q.getValue=K;q.path=function(a,c){var d=h.str(a)?e(a)[0]:a,b=c||100;return function(a){return{el:d,property:a,totalLength:N(d)*(b/100)}}};q.setDashoffset=function(a){var c=N(a);a.setAttribute("stroke-dasharray",c);return c};q.bezier=A;q.easings=Q;q.timeline=function(a){var c=q(a);c.pause();c.duration=0;c.add=function(d){c.children.forEach(function(a){a.began=
 !0;a.completed=!0});m(d).forEach(function(b){var d=z(b,D(S,a||{}));d.targets=d.targets||a.targets;b=c.duration;var e=d.offset;d.autoplay=!1;d.direction=c.direction;d.offset=h.und(e)?b:L(e,b);c.began=!0;c.completed=!0;c.seek(d.offset);d=q(d);d.began=!0;d.completed=!0;d.duration>b&&(c.duration=d.duration);c.children.push(d)});c.seek(0);c.reset();c.autoplay&&c.restart();return c};return c};q.random=function(a,c){return Math.floor(Math.random()*(c-a+1))+a};return q});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
-/* 89 */,
-/* 90 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
