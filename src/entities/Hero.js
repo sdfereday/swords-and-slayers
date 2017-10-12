@@ -18,6 +18,8 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
 
         this.initManualInput();
 
+        console.log(this);
+
     }
 
     update() {
@@ -39,7 +41,7 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
     }
 
     /// Manual Input ///
-    inputUpdate(inputType) {
+    inputUpdate() {
 
         this.resetMovement(); 
 
@@ -49,7 +51,7 @@ class Hero extends mix(BaseEntity).with(InputManager, HitEffects, AttachedWeapon
         } else if (this.rightInputIsActive()) {
             this.body.velocity.x += this.config.movementSpeed;
             this.correctScale(1);
-        }console.log(this.body);
+        }
 
         if (this.body.touching.down) {
             this.jumps = 2;

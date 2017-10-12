@@ -37,13 +37,19 @@ class BaseEntity extends Phaser.Sprite {
     mountData(data) {
 
         if (data.config)
-            Object.defineProperties(this.config, data.config);
+            Object.defineProperties(this, {
+                config: data.config
+            });
 
         if (data.stats)
-            Object.defineProperties(this.stats, data.stats);
+            Object.defineProperties(this, {
+                stats: data.stats
+            });
 
         if (data.equipment)
-            Object.defineProperties(this.equipment, data.equipment);
+            Object.defineProperties(this, {
+                equipment: data.equipment
+            });
 
         if (data.body)
             this.body.setSize(data.body.x, data.body.y, data.body.w, data.body.h);

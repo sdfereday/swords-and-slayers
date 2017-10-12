@@ -23,8 +23,8 @@ class GameState {
 
     render() {
 
-        //this.game.debug.bodyInfo(this.hero, 32, 32);
-        this.game.debug.body(this.hero);
+        // this.game.debug.bodyInfo(this.hero, 32, 32);
+        // this.game.debug.body(this.hero);
 
         // this.game.debug.bodyInfo(this.hero.activeWeapon, 32, 32);
         // this.game.debug.body(this.hero.activeWeapon);
@@ -100,7 +100,7 @@ class GameState {
         this.collisionLayer = world.getLayerByProperty('collisionLayer');
 
         // Make entities
-        this.hero = new Hero(this.game, 0, 0, DSGameData.player.sprite, {
+        this.hero = new Hero(this.game, 32, 0, DSGameData.player.sprite, {
             config: DSGameData.player.config,
             stats: DSGameData.player.stats,
             equipment: DSGameData.player.equipment
