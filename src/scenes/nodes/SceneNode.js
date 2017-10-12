@@ -1,15 +1,20 @@
 class SceneNode {
 
-    constructor(wait) {
+    constructor(wait, id) {
 
+        this.id = id;
         this.name = 'Root';
         this.isDone = false;
+        this.started = false;
         this.waitForInput = typeof wait === 'undefined' ? true : wait;
 
     }
 
     enter() {
-        // ...
+        
+        this.isDone = false;
+        this.started = true;
+
     }
 
     update() {
@@ -17,7 +22,9 @@ class SceneNode {
     }
 
     exit() {
-        // ...
+        
+        this.isDone = true;
+
     }
 
 }

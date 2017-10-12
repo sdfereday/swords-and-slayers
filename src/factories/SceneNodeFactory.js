@@ -1,4 +1,5 @@
 // Data
+import Helpers from '../helpers/Helpers';
 import NodeTypes from '../enums/SceneNodeTypes';
 import Talk from '../scenes/nodes/Talk';
 import Parallel from '../scenes/nodes/Parallel';
@@ -52,17 +53,17 @@ class BehaviourFactory {
 
         switch (nd.type) {
             case NodeTypes.TALK:
-                return new CNS(nd.data, nd.waitForInput);
+                return new CNS(nd.data, nd.waitForInput, Helpers.guid());
             case NodeTypes.MOVE:
-                return new CNS(nd.data, nd.waitForInput);
+                return new CNS(nd.data, nd.waitForInput, Helpers.guid());
             case NodeTypes.ANIM:
-                return new CNS(nd.data, nd.waitForInput);
+                return new CNS(nd.data, nd.waitForInput, Helpers.guid());
             case NodeTypes.FADE:
-                return new CNS(nd.data, nd.waitForInput);
+                return new CNS(nd.data, nd.waitForInput, Helpers.guid());
             case NodeTypes.SEQUENCE:
-                return new CNS(children, nd.waitForInput);
+                return new CNS(children, nd.waitForInput, Helpers.guid());
             case NodeTypes.PARALLEL:
-                return new CNS(children, nd.asynced, nd.waitForInput);
+                return new CNS(children, nd.asynced, nd.waitForInput, Helpers.guid());
             default:
                 throw new Error("Unrecognized node type:" + nd.type);
         }

@@ -3,7 +3,7 @@ import SceneNode from '../nodes/SceneNode';
 
 class Fade extends SceneNode {
 
-    constructor(data, wait) {
+    constructor(data, wait, id) {
 
         super(wait);
 
@@ -14,7 +14,7 @@ class Fade extends SceneNode {
 
     enter(params) {
 
-        this.isDone = false;
+        super.enter();
 
         if (this.transition.dir > 0) {
             params.camera.fade(0x000000, 1);
@@ -22,31 +22,18 @@ class Fade extends SceneNode {
                 params.camera.flash('#000000', Phaser.Timer.SECOND * 1);
                 // Not ideal, but there's no flash callback sadly.
                 params.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
-                    this.isDone = true;
-                    console.log("Fade In Done.");
+                    this.exit();
                 }, this);
             }, this);
         } else {
+            console.log("Fade out begin...");
             params.game.time.events.add(Phaser.Timer.SECOND * 1, () => {
                 params.camera.fade(0x000000, Phaser.Timer.SECOND * 1);
                 params.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
-                    this.isDone = true;
-                    console.log("Fade Out Done.");
+                    this.exit();
                 }, this);
             }, this);
         }
-
-    }
-
-    update() {
-
-        console.log(this.isDone);
-
-    }
-
-    exit() {
-
-        this.isDone = false;
 
     }
 

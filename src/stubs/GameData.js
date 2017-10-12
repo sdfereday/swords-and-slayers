@@ -85,6 +85,7 @@ let gameData = {
     actors: [
         {
             id: 'penny',
+            name: 'Penny',
             sprite: 'player',
             body: {
                 x: 48,
@@ -133,6 +134,7 @@ let gameData = {
         },
         {
             id: 'mum',
+            name: 'Mum',
             sprite: 'player',
             body: {
                 x: 48,

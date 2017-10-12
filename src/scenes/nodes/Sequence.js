@@ -2,7 +2,7 @@ import SceneNode from '../nodes/SceneNode';
 
 class Sequence extends SceneNode {
 
-    constructor(children, data, wait) {
+    constructor(children, data, wait, id) {
 
         super(wait);
 
@@ -16,6 +16,8 @@ class Sequence extends SceneNode {
 
     enter(params) {
 
+        super.enter();
+
         this.currentNodeIndex = 0;
         this.current = this.top();
 
@@ -24,7 +26,7 @@ class Sequence extends SceneNode {
     update() {
 
         if (this.currentNodeIndex > this.len) {
-            this.isDone = true;
+            this.exit();
             return;
         }
 

@@ -117,6 +117,9 @@ class TheatreState {
 
     update() {
 
+        if(this.sceneManager.stopped)
+            return;
+
         this.game.physics.arcade.collide(this.actors, this.collisionLayer.phaserLayer);
         this.sceneManager.update();
 

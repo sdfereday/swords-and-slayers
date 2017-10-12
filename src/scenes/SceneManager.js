@@ -9,8 +9,8 @@ class SceneManager {
         this.game = game;
         this.initialParams = {};
         this.currentSceneIndex = 0;
-        this.started = false;
-        this.ran = false;
+        this.sequenceFinished = false;
+        this.stopped = false;
 
         this.sceneRoot = DSScenes.find(x => x.id === sceneId);
         this.sceneData = SceneNodeFactory.mount(this.sceneRoot.sequence);
@@ -19,21 +19,28 @@ class SceneManager {
 
     update() {
 
-        if (!this.current)
+        if (!this.current || this.stopped)
             return;
 
-        this.current.update();
+        if (this.sequenceFinished && this.allComplete()) {
+
+            console.info("Waiting for remaining tasks to finish...");
+            this.onFinished();
+
+            return;
+
+        }
 
         // TODO: Put in standard loop, foreach is very slow...
         this.sceneData.forEach((x) => {
-            
-            // ...so is object comparison ---------------v
-            if(!x.isDone && x.started && x.asynced && x !== this.current)
+
+            // Just update all of them if they're not done (including current)
+            if (!x.isDone && x.started)
                 x.update();
 
         }, this);
-
-        if (this.current.isDone && !this.current.waitForInput) {
+        
+        if (this.current.isDone && !this.current.waitForInput && !this.sequenceFinished) {
 
             this.current.exit();
             this.next();
@@ -44,11 +51,8 @@ class SceneManager {
 
     next() {
 
-        if (this.ran || this.current && !this.current.isDone && !this.current.asynced)
+        if (this.sequenceFinished || this.current && !this.current.isDone && !this.current.asynced)
             return;
-
-        if (!this.started)
-            throw new Error("You must start the sequence before calling 'next'.");
 
         this.current = this.sceneData[this.currentSceneIndex];
         this.current.enter(this.initialParams);
@@ -56,9 +60,12 @@ class SceneManager {
         this.currentSceneIndex += 1;
 
         if (this.currentSceneIndex > this.sceneData.length - 1) {
-            this.started = false;
-            this.ran = true;
-            this.onFinished();
+
+            this.sequenceFinished = true;
+
+            if (this.allComplete())
+                this.onFinished();
+
         }
 
     }
@@ -66,7 +73,6 @@ class SceneManager {
     start(params) {
 
         if (this.sceneData.length > 0) {
-            this.started = true;
             this.initialParams = params;
             this.next();
         } else {
@@ -75,10 +81,28 @@ class SceneManager {
 
     }
 
+    allComplete() {
+
+        return this.sceneData.every(x => x.isDone);
+
+    }
+
     onFinished() {
+
+        this.stopped = true;
+        this.current = null;
 
         console.log("Sequence finished at", new Date().getTime());
         console.log("Transitiont to next scene:", this.sceneRoot.nextScene);
+
+        // Who's done?
+        for (let i = 0; i < this.sceneData.length; i++) {
+            console.log(this.sceneData[i].isDone);
+        }
+
+        console.log("... of:", this.sceneData.length);
+
+        return;
 
         // TODO: Check for garbage hanging around.
         this.game.state.start(this.sceneRoot.nextScene);

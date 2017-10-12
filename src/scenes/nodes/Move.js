@@ -2,12 +2,11 @@ import SceneNode from '../nodes/SceneNode';
 
 class Move extends SceneNode {
 
-    constructor(data, wait) {
+    constructor(data, wait, id) {
 
         super(wait);
 
         this.name = 'Move';
-        this.waitForInput = data.waitForInput;
 
         this.targetId = data.targetId;
         this.currentTarget = null;
@@ -23,6 +22,8 @@ class Move extends SceneNode {
 
     enter(params) {
 
+        super.enter();
+
         if (!params || !params.actors)
             return;
 
@@ -32,17 +33,16 @@ class Move extends SceneNode {
 
     update() {
 
-        if(this.isDone)
-            return;
-
-        this.isDone = this.currentTarget.moveTo({
+        let complete = this.currentTarget.moveTo({
             x: this.config.x,
             y: this.config.ignoreY ? this.currentTarget.y : this.config.y,
             speed: this.config.speed
         });
 
-        if(this.isDone)
+        if(complete) {
+            this.exit();
             this.currentTarget.stop();
+        }
 
     }
 

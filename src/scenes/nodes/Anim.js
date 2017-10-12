@@ -2,7 +2,7 @@ import SceneNode from '../nodes/SceneNode';
 
 class Anim extends SceneNode {
 
-    constructor(data, wait) {
+    constructor(data, wait, id) {
 
         super(wait);
         
@@ -13,11 +13,12 @@ class Anim extends SceneNode {
 
     enter(params) {
 
-        this.isDone = false;
+        super.enter();
+
         console.log("Play", this.animation);
 
         params.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
-            this.isDone = true;
+            this.exit();
         }, this);
 
     }

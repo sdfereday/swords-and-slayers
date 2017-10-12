@@ -2,7 +2,7 @@ import SceneNode from '../nodes/SceneNode';
 
 class Parallel extends SceneNode {
 
-    constructor(children, asynced, wait) {
+    constructor(children, asynced, wait, id) {
 
         super(wait);
 
@@ -18,7 +18,7 @@ class Parallel extends SceneNode {
 
     enter(params) {
 
-        this.started = true;
+        super.enter();
 
         for (let i = 0; i < this.len; i++) {
             this.children[i].enter(params);
@@ -28,20 +28,21 @@ class Parallel extends SceneNode {
 
     update() {
 
-        if(this.isDone) {
-            this.exit();
-            this.started = false;
-            return;
-        }
-
-        this.isDone = this.children.every((x) => {
+        let complete = this.children.every((x) => {
             x.update();
             return x.isDone;
         });
 
+        if(complete) {
+            this.exit();
+            return;
+        }
+
     }
 
     exit() {
+
+        super.exit();
 
         for (let i = 0; i < this.len; i++) {
             this.children[i].exit();

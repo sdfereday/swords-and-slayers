@@ -1,38 +1,63 @@
+import Phaser from 'phaser';
 import SceneNode from '../nodes/SceneNode';
 import EventManager from '../../events/EventManager';
+import DSGameData from '../../stubs/GameData';
 
 class Talk extends SceneNode {
 
-    constructor(data, wait) {
+    constructor(data, wait, id) {
 
         super(wait);
-        
+
         this.name = 'Talk';
-        this.str = data.str;
+        this.exitAfterSeconds = data.exitAfterSeconds;
+        this.initialNode = data.initialNode;
+        this.endNode = data.endNode;
         this.targetId = data.targetId;
+
+        this.actorName = DSGameData.actors.find(x => x.id === this.targetId).name;
+        this.str = data.str;
+
+        this.eventData = [this.actorName, this.str];
 
     }
 
     enter(params) {
-    
-        console.log(this.name);
-        console.log(this.str);
-        console.log(params);
 
-        if(!params || !params.actors)
+        super.enter();
+
+        if (!params || !params.actors)
             return;
 
         let target = params.actors.find(x => x.data.id === this.targetId);
 
-        this.isDone = true;
+        if (this.exitAfterSeconds) {
+            params.game.time.events.add(Phaser.Timer.SECOND * this.exitAfterSeconds, () => {
+                this.closeSelf();
+            }, this);
+        } else {
+            this.closeSelf();
+        }
 
-        EventManager.Trigger('onChat', this.str);
+        if (this.initialNode) {
+            EventManager.Trigger('onChatStart', this.eventData);
+        } else {
+            EventManager.Trigger('onChatUpdate', this.eventData);
+        }
 
+    }
+
+    closeSelf() {
+        this.exit();
+        if (this.endNode)
+            EventManager.Trigger('onChatExit');
     }
 
     exit(cb) {
 
-        if(typeof cb === 'function')
+        super.exit();
+
+        if (typeof cb === 'function')
             cb.call(this);
 
     }

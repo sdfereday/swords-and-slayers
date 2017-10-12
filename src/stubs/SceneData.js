@@ -18,6 +18,7 @@ const SceneData = [
                 name: "Talk",
                 type: NodeTypes.TALK,
                 data: {
+                    initialNode: true,
                     targetId: "mum",
                     str: "...Why don't we discuss this inside {{playername}}?"
                 }
@@ -86,7 +87,9 @@ const SceneData = [
                 waitForInput: false,
                 data: {
                     targetId: "mum",
-                    str: "{{playername}} wait! Come back! It's too dangerous in the forest alone!"
+                    str: "{{playername}} wait! Come back! It's too dangerous in the forest alone!",
+                    exitAfterSeconds: 2,
+                    endNode: true
                 }
             },
             {
