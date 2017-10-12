@@ -45,17 +45,23 @@ export default class DialogueBox extends React.Component {
     // Start / Finish
     onChatStart(args) {
 
+        console.log("Chat begins");
+
         this.setState({
             name: args[0],
             text: args[1],
         });
 
+        this.startFade.restart();
         this.startFade.play();
 
     }
 
     onChatExit() {
 
+        console.log("Chat exit");
+
+        this.endFade.restart();
         this.endFade.play();
 
     }
@@ -63,6 +69,8 @@ export default class DialogueBox extends React.Component {
     // Singular events
     // Continuous
     onChatUpdate(args) {
+
+        console.log("Chat updates.");
 
         this.pendingState.name = args[0];
         this.pendingState.text = args[1];
@@ -78,6 +86,7 @@ export default class DialogueBox extends React.Component {
         }
 
         this.animationInProgress = true;
+
         this.fadeOut.restart();
         this.fadeOut.play();
 
@@ -94,11 +103,13 @@ export default class DialogueBox extends React.Component {
         this.fadeIn.restart();
         this.fadeIn.play();
 
+        this.animationInProgress = false;
+
     }
 
     onFadedIn() {
 
-        this.animationInProgress = false;
+        
 
     }
 

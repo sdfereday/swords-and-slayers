@@ -15,7 +15,7 @@ class Actor extends mix(BaseEntity).with() {
     /// AI Movement ///
     stop() {
 
-        console.log("Actor stopped at", new Date().getTime());
+        //console.log("Actor stopped at", new Date().getTime());
         this.resetMovement();
 
     }

@@ -28,15 +28,12 @@ class Parallel extends SceneNode {
 
     update() {
 
-        let complete = this.children.every((x) => {
-            x.update();
-            return x.isDone;
-        });
-
-        if(complete) {
-            this.exit();
-            return;
+        for (let i = 0; i < this.len; i++) {
+            this.children[i].update();
         }
+
+        if (this.children.every(x => x.isDone))
+            this.exit();
 
     }
 

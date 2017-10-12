@@ -15,12 +15,15 @@ class TheatreState {
 
     init(params) {
 
+        // Because you 'might' want to load the same map but run a different scene, we keep
+        // the two separated.
         console.log("State change params:", params);
+        this.sceneData = params;
 
     }
 
     preload() {
-        
+
         // Load plugins
         this.game.plugins.add(Phaser.Plugin.ArcadeSlopes);
 
@@ -62,7 +65,7 @@ class TheatreState {
         this.game.stage.backgroundColor = '#2d2d2d';
 
         // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
-        let mapData = DSMapData.find(x => x.id === 'introduction');
+        let mapData = DSMapData.find(x => x.id === this.sceneData.useMapId);
         let world = new WorldBuilder(this.game);
         world.initializeWorld(mapData.world);
 
@@ -79,17 +82,17 @@ class TheatreState {
         }, this);
 
         actors.forEach((actor) => {
-            
+
             this.actors.add(actor.sprite);
             world.enableSlopesFor(actor.sprite);
 
-            if(actor.data.startFacing)
+            if (actor.data.startFacing)
                 actor.sprite.correctScale(actor.data.startFacing);
 
         });
 
         // Scene data sequence for this scene
-        this.sceneManager = new SceneManager('scene-1', this.game);
+        this.sceneManager = new SceneManager(this.sceneData.useSceneId, this.game);
         this.sceneManager.start({
             actors: actors,
             camera: this.game.camera,
@@ -112,12 +115,12 @@ class TheatreState {
         // Some stuff like 'focus on' which is very useful.
         //this.game.camera.follow(actors[1].sprite, Phaser.Camera.FOLLOW_TOPDOWN);
         this.game.camera.focusOnXY(this.game.width / 2, this.game.height);
-        
+
     }
 
     update() {
 
-        if(this.sceneManager.stopped)
+        if (this.sceneManager.stopped)
             return;
 
         this.game.physics.arcade.collide(this.actors, this.collisionLayer.phaserLayer);

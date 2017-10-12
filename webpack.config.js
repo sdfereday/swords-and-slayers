@@ -78,13 +78,13 @@ module.exports = {
             b3: 'b3',
             SAT: 'sat'
         }),
-        // new webpack.optimize.UglifyJsPlugin({
-        //     drop_console: false,
-        //     minimize: true,
-        //     output: {
-        //         comments: false
-        //     }
-        // })
+        new webpack.optimize.UglifyJsPlugin({
+            drop_console: false,
+            minimize: true,
+            output: {
+                comments: false
+            }
+        })
     ],
     watch: true
 };

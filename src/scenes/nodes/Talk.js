@@ -12,13 +12,17 @@ class Talk extends SceneNode {
         this.name = 'Talk';
         this.exitAfterSeconds = data.exitAfterSeconds;
         this.initialNode = data.initialNode;
-        this.endNode = data.endNode;
         this.targetId = data.targetId;
 
         this.actorName = DSGameData.actors.find(x => x.id === this.targetId).name;
         this.str = data.str;
 
         this.eventData = [this.actorName, this.str];
+
+        this.closedByUser = data.closedByUser ? data.closedByUser : true;
+
+        // I'd rather not have this, but so far I'm out of ideas.
+        this.endNode = data.endNode;
 
     }
 
@@ -31,34 +35,32 @@ class Talk extends SceneNode {
 
         let target = params.actors.find(x => x.data.id === this.targetId);
 
-        if (this.exitAfterSeconds) {
-            params.game.time.events.add(Phaser.Timer.SECOND * this.exitAfterSeconds, () => {
-                this.closeSelf();
-            }, this);
-        } else {
-            this.closeSelf();
-        }
-
         if (this.initialNode) {
             EventManager.Trigger('onChatStart', this.eventData);
         } else {
             EventManager.Trigger('onChatUpdate', this.eventData);
         }
 
+        if (this.exitAfterSeconds) {
+            params.game.time.events.add(Phaser.Timer.SECOND * this.exitAfterSeconds, () => {
+                super.exit();
+                EventManager.Trigger('onChatExit');
+            }, this);
+        } else {
+           // this.exit(); -> This being here seems to fix everything... why is this?
+        }
+
     }
 
-    closeSelf() {
-        this.exit();
-        if (this.endNode)
-            EventManager.Trigger('onChatExit');
-    }
+    exit() {
 
-    exit(cb) {
+        if(this.exitAfterSeconds)
+            return;
 
         super.exit();
 
-        if (typeof cb === 'function')
-            cb.call(this);
+        if(this.closedByUser && this.endNode)
+            EventManager.Trigger('onChatExit');
 
     }
 
