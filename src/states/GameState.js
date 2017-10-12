@@ -12,10 +12,19 @@ import Hero from '../entities/Hero';
 
 class GameState {
 
+    init(params) {
+
+        // Because you 'might' want to load the same map but run a different scene, we keep
+        // the two separated.
+        console.log("State change params:", params);
+        this.sceneData = params;
+
+    }
+
     render() {
 
         //this.game.debug.bodyInfo(this.hero, 32, 32);
-        //this.game.debug.body(this.hero);
+        this.game.debug.body(this.hero);
 
         // this.game.debug.bodyInfo(this.hero.activeWeapon, 32, 32);
         // this.game.debug.body(this.hero.activeWeapon);
@@ -30,11 +39,11 @@ class GameState {
     preload() {
 
         // scale the game 4x
-        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
+        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
         this.game.scale.setUserScale(6, 6);
 
         // enable crisp rendering
-        this.game.renderer.renderSession.roundPixels = true;  
+        this.game.renderer.renderSession.roundPixels = true;
         Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
         // this.game.load.spritesheet('player', 'resources/Game/player.png', 128, 128, 20);
@@ -83,7 +92,7 @@ class GameState {
         this.game.stage.backgroundColor = '#2d2d2d';
 
         // Create some ground for the player to walk on (this will be replaced by tilesets and proper parsing later)
-        let mapData = DSMapData.find(x => x.id === 'testlevel');
+        let mapData = DSMapData.find(x => x.id === this.sceneData.useMapId);
         let world = new WorldBuilder(this.game);
         world.initializeWorld(mapData.world);
 

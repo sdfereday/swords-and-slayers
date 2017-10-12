@@ -9,7 +9,7 @@ const AnimeAnims = {
         opacity: [0, 1],
         bounce: 0,
         easing: 'linear',
-        duration: 200,
+        duration: 100,
         autoplay: false
     },
     'fadeOut': {
@@ -17,7 +17,7 @@ const AnimeAnims = {
         opacity: [1, 0],
         bounce: 0,
         easing: 'linear',
-        duration: 200,
+        duration: 100,
         autoplay: false
     }
 };

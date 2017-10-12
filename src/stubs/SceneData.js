@@ -4,17 +4,18 @@ import NodeTypes from '../enums/SceneNodeTypes';
 const SceneData = [
     {
         id: "scene-1",
+        nextState: "SceneState",
         nextMap: "introduction",
         nextScene: "scene-2",
         sequence: [
-            // {
-            //     name: "Fade",
-            //     type: NodeTypes.FADE,
-            //     waitForInput: false,
-            //     data: {
-            //         dir: 1
-            //     }
-            // },
+            {
+                name: "Fade",
+                type: NodeTypes.FADE,
+                waitForInput: false,
+                data: {
+                    dir: 1
+                }
+            },
             {
                 name: "Talk",
                 type: NodeTypes.TALK,
@@ -114,6 +115,7 @@ const SceneData = [
     },
     {
         id: "scene-2",
+        nextState: "GameState",
         nextMap: "testlevel",
         nextScene: "",
         sequence: [

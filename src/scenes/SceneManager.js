@@ -1,4 +1,3 @@
-// Data
 import DSScenes from '../stubs/SceneData';
 import SceneNodeFactory from '../factories/SceneNodeFactory';
 
@@ -52,21 +51,21 @@ class SceneManager {
     next() {
 
         if (this.current && !this.current.isDone) {
-            
+
             // Experimental
-            if(this.current.children) {
-                
+            if (this.current.children) {
+
                 let presentToClose = this.current.children.find(x => x.closedByUser && !x.isDone);
 
                 console.log(presentToClose, this.current.children);
-                
-                if(presentToClose) {
+
+                if (presentToClose) {
                     console.log(presentToClose);
                     presentToClose.exit();
                 }
 
-            } else if(this.current.closedByUser) {
-                
+            } else if (this.current.closedByUser) {
+
                 this.current.exit();
 
             }
@@ -127,7 +126,7 @@ class SceneManager {
         // TODO: Check for garbage hanging around
         // TODO: Experiment with cache purge, you may 'not' want to do both. Remember, to clear asset cache
         // you must set the first boolean to true also (world clear).
-        this.game.state.start('SceneState', true, true, {
+        this.game.state.start(this.sceneRoot.nextState, true, true, {
             useMapId: this.sceneRoot.nextMap,
             useSceneId: this.sceneRoot.nextScene
         });

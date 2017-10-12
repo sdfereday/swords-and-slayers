@@ -12,9 +12,9 @@ class Game extends Phaser.Game {
     super(192, 108, Phaser.AUTO, 'game', null);
     this.state.add('SceneState', SceneState, false);
     this.state.add('GameState', GameState, false);
-    this.state.start('SceneState', false, false, {
-      useMapId: 'introduction',
-      useSceneId: 'scene-1'
+    this.state.start('GameState', false, false, {
+      useMapId: 'testlevel',
+      useSceneId: 'scene-2'
     });
   }
 

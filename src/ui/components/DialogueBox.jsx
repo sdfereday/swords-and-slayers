@@ -108,8 +108,8 @@ export default class DialogueBox extends React.Component {
     }
 
     onFadedIn() {
-
         
+        // ...
 
     }
 
