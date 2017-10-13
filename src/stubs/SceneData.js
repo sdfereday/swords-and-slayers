@@ -4,9 +4,11 @@ import NodeTypes from '../enums/SceneNodeTypes';
 const SceneData = [
     {
         id: "scene-1",
-        nextState: "SceneState",
-        nextMap: "introduction",
-        nextScene: "scene-2",
+        next: {
+            nextState: "SceneState",
+            nextMap: "introduction",
+            nextScene: "scene-2"
+        },
         sequence: [
             {
                 name: "Fade",
@@ -68,7 +70,7 @@ const SceneData = [
                         type: NodeTypes.TALK,
                         data: {
                             targetId: "penny",
-                            str: "Enough already! I need time alone. Anywhere but here."
+                            str: "Enough already! I've heard enough!"
                         }
                     },
                     {
@@ -89,9 +91,7 @@ const SceneData = [
                 waitForInput: false,
                 data: {
                     targetId: "mum",
-                    str: "{{playername}} wait! Come back! It's too dangerous in the forest alone!",
-                    exitAfterSeconds: 2,
-                    endNode: true
+                    str: "{{playername}} wait! Come back! You'll get lost!"
                 }
             },
             {
@@ -101,6 +101,16 @@ const SceneData = [
                 data: {
                     targetId: "mum",
                     animName: "runstumble"
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "mum",
+                    str: "...Please...just wait...",
+                    //exitAfterSeconds: 1,
+                    endNode: true
                 }
             },
             {
@@ -115,9 +125,106 @@ const SceneData = [
     },
     {
         id: "scene-2",
-        nextState: "GameState",
-        nextMap: "testlevel",
-        nextScene: "",
+        next: {
+            nextState: "SceneState",
+            nextMap: "grasslands",
+            nextScene: "scene-3"
+        },
+        sequence: [
+            {
+                name: "Fade",
+                type: NodeTypes.FADE,
+                waitForInput: false,
+                data: {
+                    dir: 1
+                }
+            },
+            //* Walking through forest *
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "...I've been walking for hours, maybe I should go back.",
+                    initialNode: true
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "If only I wanted to go back... I hate this place... Dad, why did you leave us..."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Damn it! It's both your faults, why are parents so irritating?! What the hell am I supposed to do...?"
+                }
+            },
+            //* spirit appears, you stop *
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Wh... what.. is..."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "spirit",
+                    str: "Time... is short..."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Who are you?! I don't..."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "spirit",
+                    str: "There is no time to explain. You will have to do."
+                }
+            },
+            //* teleport animation loop *
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Wait!",
+                    endNode: true
+                }
+            },
+            //* teleport casts *
+            {
+                name: "Fade",
+                type: NodeTypes.FADE,
+                waitForInput: false,
+                data: {
+                    dir: -1
+                }
+            }
+        ]
+    },
+    {
+        id: "scene-3",
+        next: {
+            nextState: "GameState",
+            nextMap: "grasslands"
+        },
         sequence: [
             {
                 name: "Fade",
@@ -132,8 +239,7 @@ const SceneData = [
                 type: NodeTypes.TALK,
                 data: {
                     targetId: "penny",
-                    str: "beep boop",
-                    initialNode: true
+                    str: "...Is this all for real?"
                 }
             },
             {
@@ -141,7 +247,40 @@ const SceneData = [
                 type: NodeTypes.TALK,
                 data: {
                     targetId: "penny",
-                    str: "boop beep",
+                    str: "Come on Penny, just get a grip. I'm not going to figure anything out just being stood here."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "...Huh... is that a sword?"
+                }
+            },
+            // *Walk to sword and pick up*
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Seems like it could come in useful... although I'm not totally sure how to use it..."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "I'll take it with me just in case."
+                }
+            },
+            {
+                name: "Talk",
+                type: NodeTypes.TALK,
+                data: {
+                    targetId: "penny",
+                    str: "Seem the only way now is forwards... past all of those... monsters... great.",
                     endNode: true
                 }
             },
@@ -156,5 +295,27 @@ const SceneData = [
         ]
     }
 ];
+
+/*
+At the end of level 1 (rather than before):
+Urgh... what the hell just happened...
+Where is this... what's going on?!
+"Penny is it?"
+Y..yes?
+"Ah, excellent. I've been expecting you...."
+Please just tell me what's going on...
+"You are in the land of the spirits. As luck would have it, you're exactly what we've been looking for 
+to help us with our 'problem'."
+Problem?
+"Indeed. I realize this must be an odd situation..."
+Odd!? You have no idea! Look you've got the wrong person, I just want to go home.
+"Unfortunately the portal is one way. The only way out of here now regrettably is forwards, and, 
+forward is blocked by evil."
+...Why... why me?
+"You are of special blood. In time, you will learn more of you truly are, worry not. But time is short, 
+we must away."
+Where?! Where am I supposed to go?
+*teleports*
+*/
 
 export default SceneData;
